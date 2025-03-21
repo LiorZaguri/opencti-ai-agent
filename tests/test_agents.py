@@ -54,7 +54,7 @@ class TestBaseAgent(unittest.TestCase):
     def test_logging(self, mock_logger):
         agent = TestAgent(name="logging_agent")
         # Check initialization log
-        mock_logger.info.assert_called_with("Initialized agent: logging_agent (cache enabled: True)")
+        mock_logger.info.assert_called_with("Initialized agent: logging_agent cache enabled: True with token limit: 10000")
 
         # Check task execution logs
         agent.execute_task("test task")
