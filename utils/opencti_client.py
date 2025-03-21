@@ -4,6 +4,21 @@ from utils.logger import setup_logger
 
 logger = setup_logger(name="OpenCTIConnector", component_type="utils")
 
+def _prepare_filters(filters):
+    """
+    Ensure each filter dictionary includes default 'operator' and 'filterMode' fields.
+    Defaults: operator -> "eq", filterMode -> "in".
+    """
+    prepared = []
+    for f in filters:
+        if 'operator' not in f:
+            f['operator'] = 'eq'
+        if 'filterMode' not in f:
+            f['filterMode'] = 'in'
+        prepared.append(f)
+    return prepared
+
+
 class OpenCTIConnector:
     def __init__(self):
         """Initialize the OpenCTI connector."""
@@ -13,25 +28,11 @@ class OpenCTIConnector:
         )
         logger.info("OpenCTI connector initialized successfully")
 
-    def _prepare_filters(self, filters):
-        """
-        Ensure each filter dictionary includes default 'operator' and 'filterMode' fields.
-        Defaults: operator -> "eq", filterMode -> "in".
-        """
-        prepared = []
-        for f in filters:
-            if 'operator' not in f:
-                f['operator'] = 'eq'
-            if 'filterMode' not in f:
-                f['filterMode'] = 'in'
-            prepared.append(f)
-        return prepared
-
     def get_threat_actors(self, filters=None):
         """Retrieve threat actors from OpenCTI."""
         try:
             if filters:
-                filters = self._prepare_filters(filters)
+                filters = _prepare_filters(filters)
                 return self.client.threat_actor.list(filters=filters)
             else:
                 return self.client.threat_actor.list()
@@ -43,7 +44,7 @@ class OpenCTIConnector:
         """Retrieve indicators from OpenCTI."""
         try:
             if filters:
-                filters = self._prepare_filters(filters)
+                filters = _prepare_filters(filters)
                 return self.client.indicator.list(filters=filters)
             else:
                 return self.client.indicator.list()
@@ -55,7 +56,7 @@ class OpenCTIConnector:
         """Retrieve observables from OpenCTI."""
         try:
             if filters:
-                filters = self._prepare_filters(filters)
+                filters = _prepare_filters(filters)
                 return self.client.stix_cyber_observable.list(filters=filters)
             else:
                 return self.client.stix_cyber_observable.list()
