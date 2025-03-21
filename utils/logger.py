@@ -4,21 +4,29 @@ from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 from config.settings import LOG_LEVEL
 
+
 def setup_logger(
         name="CTIAgentLogger",
         log_dir="logs",
+        component_type="system",
         console_level=getattr(logging, LOG_LEVEL),
         file_level=logging.DEBUG,
         propagate=False
 ):
     """Configure and return a logger with file and console handlers."""
+    # Get the project root directory (assuming this file is in utils/ directory)
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Create absolute path to logs directory in project root
+    logs_absolute_path = os.path.join(project_root, log_dir)
+
     # Create logs directory if it doesn't exist
-    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(logs_absolute_path, exist_ok=True)
 
-    # Set up log file with timestamp
-    log_filename = os.path.join(log_dir, f"agent_{datetime.now().strftime('%Y-%m-%d')}.log")
+    # Set up log file with timestamp and component type using absolute path
+    log_filename = os.path.join(logs_absolute_path, f"{component_type}_{datetime.now().strftime('%Y-%m-%d')}.log")
 
-    # Get or create logger
+    # Rest of the function remains the same
     logger = logging.getLogger(name)
     logger.setLevel(min(console_level, file_level))
     logger.propagate = propagate
@@ -29,7 +37,7 @@ def setup_logger(
         console_handler = logging.StreamHandler()
         console_handler.setLevel(console_level)
 
-        # File handler with rotation (one file per day, keep 30 days of logs)
+        # File handler with rotation
         file_handler = TimedRotatingFileHandler(
             log_filename,
             when="midnight",
@@ -48,7 +56,3 @@ def setup_logger(
         logger.addHandler(file_handler)
 
     return logger
-
-
-# Create the default logger instance
-logger = setup_logger()

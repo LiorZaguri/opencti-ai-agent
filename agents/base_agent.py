@@ -1,9 +1,11 @@
 from autogen import ConversableAgent
 from config.model_configs import default_config_list, default_llm_config
 from typing import Any, Dict
-from utils.logger import logger
+from utils.logger import setup_logger
 from memory.cache_manager import get_agent_cache
 from abc import ABC, abstractmethod
+
+logger = setup_logger(name="base_agent", component_type="agents")
 
 class BaseAgent(ConversableAgent, ABC):
     """

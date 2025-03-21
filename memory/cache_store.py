@@ -2,9 +2,12 @@ import os
 import json
 import hashlib
 import tempfile
-import logging
 from threading import Lock
 from typing import Optional
+from utils.logger import setup_logger
+
+# Create a memory-specific logger
+logger = setup_logger(name="CacheStore", component_type="memory")
 
 # Default path for persistent cache file
 CACHE_FILE_PATH = "memory/cache/shared_cache.json"
@@ -19,6 +22,7 @@ class CacheStore:
         self.cache_path = cache_path
         self.lock = Lock()
         self.cache = self._load_cache()
+        logger.info(f"Cache initialized at {self.cache_path} with {len(self.cache)} entries")
 
     def _load_cache(self) -> dict:
         if os.path.exists(self.cache_path):
@@ -26,7 +30,7 @@ class CacheStore:
                 try:
                     return json.load(f)
                 except json.JSONDecodeError as e:
-                    logging.error(f"Error decoding JSON from {self.cache_path}: {e}")
+                    logger.error(f"Error decoding JSON from {self.cache_path}: {e}")
                     return {}
         return {}
 
@@ -39,6 +43,7 @@ class CacheStore:
             json.dump(self.cache, tmp_file, indent=2)
             temp_name = tmp_file.name
         os.replace(temp_name, self.cache_path)
+        logger.debug(f"Cache saved to {self.cache_path} with {len(self.cache)} entries")
 
     def compute_hash(self, task: str, agent_name: str) -> str:
         """
@@ -50,23 +55,32 @@ class CacheStore:
     def get(self, task: str, agent_name: str) -> Optional[str]:
         key = self.compute_hash(task, agent_name)
         with self.lock:
-            return self.cache.get(key)
+            result = self.cache.get(key)
+            if result:
+                logger.debug(f"Cache hit for agent '{agent_name}', key hash: {key[:8]}...")
+            else:
+                logger.debug(f"Cache miss for agent '{agent_name}', key hash: {key[:8]}...")
+            return result
 
     def save(self, task: str, agent_name: str, result: str):
         key = self.compute_hash(task, agent_name)
         with self.lock:
             self.cache[key] = result
             self._save_cache()
+            logger.debug(f"Cached result for agent '{agent_name}', key hash: {key[:8]}...")
 
     def has(self, task: str, agent_name: str) -> bool:
         key = self.compute_hash(task, agent_name)
         with self.lock:
-            return key in self.cache
+            exists = key in self.cache
+            return exists
 
     def clear(self):
         with self.lock:
+            size_before = len(self.cache)
             self.cache = {}
             self._save_cache()
+            logger.info(f"Cache cleared, removed {size_before} entries")
 
     def size(self) -> int:
         with self.lock:
@@ -94,5 +108,6 @@ class CacheStore:
             if key in self.cache:
                 del self.cache[key]
                 self._save_cache()
+                logger.debug(f"Removed cache entry for agent '{agent_name}', key hash: {key[:8]}...")
                 return True
             return False
