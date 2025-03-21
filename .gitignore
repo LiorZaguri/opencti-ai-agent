@@ -1,0 +1,21 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.pyc
+.env
+.env.*
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+
+# VSCode or IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
