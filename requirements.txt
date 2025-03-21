@@ -1,0 +1,4 @@
+autogen~=0.8.3
+pyautogen~=0.8.3
+dotenv~=0.9.9
+python-dotenv~=1.0.1

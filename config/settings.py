@@ -6,6 +6,7 @@ load_dotenv()
 
 # === API Keys ===
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_BASE_MODEL = os.getenv("OPENAI_BASE_MODEL")
 OPENCTI_API_KEY = os.getenv("OPENCTI_API_KEY")
 VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY")
 

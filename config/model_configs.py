@@ -1,9 +1,9 @@
-from config.settings import OPENAI_API_KEY
+from config.settings import OPENAI_API_KEY, OPENAI_BASE_MODEL
 
 default_config_list = [
     {
-        "model": "gpt-3.5-turbo",
-        "api_key": OPENAI_API_KEY,
+        "model": OPENAI_BASE_MODEL,
+        "api_key": OPENAI_API_KEY
     }
 ]
 
