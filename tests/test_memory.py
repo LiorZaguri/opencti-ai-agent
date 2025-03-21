@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from memory.cache_store import CacheStore
 import memory.cache_manager as cache_manager
 
-TEST_CACHE_DIR = "test_memory/cache"
+TEST_CACHE_DIR = "tests/test_memory/"
 
 class TestCacheStore(unittest.TestCase):
     def setUp(self):
