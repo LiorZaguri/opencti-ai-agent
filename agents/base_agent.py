@@ -1,3 +1,5 @@
+import os
+import json
 from autogen import ConversableAgent
 from config.model_configs import default_config_list, default_llm_config
 from typing import Any, Dict
@@ -7,12 +9,19 @@ from abc import ABC, abstractmethod
 
 logger = setup_logger(name="base_agent", component_type="agents")
 
+def load_company_profile():
+    path = os.path.join("data", "company_profile.json")
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            return json.load(f)
+    return {}
+
+
 class BaseAgent(ConversableAgent, ABC):
     """
     Base class for all AI agents. Uses default LLM config unless overridden.
     Integrates logging and caching for efficiency.
     """
-
     def __init__(
             self,
             name: str,
@@ -21,15 +30,16 @@ class BaseAgent(ConversableAgent, ABC):
             llm_config: Dict[str, Any] = None,
             use_cache: bool = True,
             **kwargs
-    ):
+        ):
+
+        self.use_cache = use_cache
+        self._cache = get_agent_cache(name) if use_cache else None
+        self.company_profile = load_company_profile()
+        if not system_message:
+            system_message = self.generate_default_system_prompt()
+
         # Prepare configuration
         llm_config = llm_config or default_llm_config.copy()
-
-        # Remove unsupported parameters if they exist
-        unsupported_params = ['top_p', 'presence_penalty', 'frequency_penalty']
-        for param in unsupported_params:
-            if param in llm_config:
-                llm_config.pop(param)
 
         # Add config_list to llm_config
         if config_list:
@@ -39,13 +49,10 @@ class BaseAgent(ConversableAgent, ABC):
 
         super().__init__(
             name=name,
-            system_message=system_message or f"I am agent {name}.",
+            system_message=system_message,
             llm_config=llm_config,
             **kwargs
         )
-
-        self.use_cache = use_cache
-        self._cache = get_agent_cache(name) if use_cache else None
         logger.info(f"Initialized agent: {name} (cache enabled: {use_cache})")
 
     def execute_task(self, task: str, context=None) -> str:
@@ -79,3 +86,10 @@ class BaseAgent(ConversableAgent, ABC):
         Must be implemented by subclasses.
         """
         pass
+
+    def generate_default_system_prompt(self):
+        profile = self.company_profile
+        industry = profile.get("industry", "unknown sector")
+        region = profile.get("region", "global")
+        return f"You are an AI agent specialized in threats for the {industry} industry, operating in the {region} region. Act accordingly."
+

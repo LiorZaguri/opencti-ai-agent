@@ -1,0 +1,32 @@
+{
+  "company_name": "SecureHealth Corp",
+  "industry": "healthcare",
+  "region": "North America",
+  "organization_size": "mid",
+  "business_model": "B2C",
+  "tech_stack": [
+    "Windows Server",
+    "Microsoft 365",
+    "Splunk",
+    "Palo Alto Firewall",
+    "Okta",
+    "Azure AD"
+  ],
+  "compliance": ["HIPAA", "HITRUST"],
+  "has_internal_soc": true,
+  "security_maturity": "advanced",
+  "threat_priority": ["ransomware", "phishing", "data exfiltration"],
+  "critical_assets": [
+    "electronic health records",
+    "medical imaging systems",
+    "billing platform"
+  ],
+  "risk_tolerance": "low",
+  "past_incidents": ["ransomware-2023", "phishing-2022"],
+  "preferred_language": "English",
+  "operating_hours": {
+    "timezone": "EST",
+    "business_days": ["Monday", "Friday"],
+    "open_hours": ["08:00", "18:00"]
+  }
+}

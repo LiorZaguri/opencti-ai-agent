@@ -12,7 +12,4 @@ default_llm_config = {
     "max_tokens": 1024,
     "config_list": default_config_list,
     "seed": 42,
-    "top_p": 1.0,
-    "presence_penalty": 0.0,
-    "frequency_penalty": 0.0
 }
