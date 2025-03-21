@@ -1,4 +1,5 @@
 # .gitignore
+test_memory/
 
 # Python
 __pycache__/
