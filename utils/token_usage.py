@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any, Optional, ClassVar, TypedDict
 import os
 import tiktoken
 
@@ -8,23 +8,30 @@ from utils.logger import setup_logger
 logger = setup_logger(name="token_usage", component_type="token_usage")
 
 
+class TokenStats(TypedDict):
+    """Type definition for token usage statistics"""
+    input: int
+    output: int
+    total: int
+
+
 class TokenUsage:
     """
     Singleton class to track and enforce token usage per agent and system-wide,
     with support for per-agent custom limits via environment variables.
     """
-    _instance = None
+    _instance: Optional['TokenUsage'] = None
 
-    def __new__(cls):
+    def __new__(cls) -> 'TokenUsage':
         if cls._instance is None:
             cls._instance = super(TokenUsage, cls).__new__(cls)
             cls._instance._init()
         return cls._instance
 
-    def _init(self):
-        self.usage: Dict[str, Dict[str, int]] = {}
+    def _init(self) -> None:
+        self.usage: Dict[str, TokenStats] = {}
 
-    def log_tokens(self, agent_name: str, input_tokens: int, output_tokens: int):
+    def log_tokens(self, agent_name: str, input_tokens: int, output_tokens: int) -> None:
         total_new = input_tokens + output_tokens
 
         # Enforce per-agent limit
@@ -54,10 +61,10 @@ class TokenUsage:
 
         logger.info(f"[{agent_name}] Token usage - Input: {input_tokens}, Output: {output_tokens}, Total: {total_new}")
 
-    def get_usage(self, agent_name: str) -> Dict[str, int]:
+    def get_usage(self, agent_name: str) -> TokenStats:
         return self.usage.get(agent_name, {"input": 0, "output": 0, "total": 0})
 
-    def get_total_usage(self) -> Dict[str, int]:
+    def get_total_usage(self) -> TokenStats:
         total_input = sum(agent["input"] for agent in self.usage.values())
         total_output = sum(agent["output"] for agent in self.usage.values())
         return {
@@ -80,6 +87,6 @@ class TokenUsage:
         env_key = f"AGENT_{agent_name.upper()}_LIMIT"
         return int(os.getenv(env_key, AGENT_DEFAULT_TOKEN_LIMIT))
 
-    def reset(self):
+    def reset(self) -> None:
         self.usage.clear()
         logger.info("Token usage statistics reset.")

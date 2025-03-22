@@ -21,3 +21,9 @@ OPENCTI_BASE_URL = os.getenv("OPENCTI_BASE_URL")
 
 # === Enrichments ===
 VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY")
+
+if not OPENCTI_API_KEY or not OPENCTI_BASE_URL:
+    raise ValueError("OpenCTI configuration is incomplete")
+
+if not OPENAI_API_KEY:
+    raise ValueError("OpenAI API key is required")

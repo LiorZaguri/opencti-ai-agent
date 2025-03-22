@@ -53,7 +53,8 @@ class BaseAgent(ConversableAgent, ABC):
             llm_config=llm_config,
             **kwargs
         )
-        logger.info(f"Initialized agent: {name} cache enabled: {use_cache} with token limit: {token_tracker.get_agent_limit(self.name)}")
+        logger.info(f"Initialized agent: {name} cache enabled: {use_cache} with token limit: "
+                    f"{token_tracker.get_agent_limit(self.name)}")
 
     def execute_task(self, task: str, context=None) -> str:
         """Execute a task with caching and token tracking support"""

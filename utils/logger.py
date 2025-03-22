@@ -3,28 +3,29 @@ import os
 from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 from config.settings import LOG_LEVEL
+from typing import Union, Optional
 
 
 def setup_logger(
-        name="CTIAgentLogger",
-        log_dir="logs",
-        component_type="system",
-        console_level=getattr(logging, LOG_LEVEL),
-        file_level=logging.DEBUG,
-        propagate=False
-):
+        name: str = "CTIAgentLogger",
+        log_dir: str = "logs",
+        component_type: str = "system",
+        console_level: int = getattr(logging, LOG_LEVEL),
+        file_level: int = logging.DEBUG,
+        propagate: bool = False
+) -> logging.Logger:
     """Configure and return a logger with file and console handlers."""
     # Get the project root directory (assuming this file is in utils/ directory)
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    project_root: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     # Create absolute path to logs directory in project root
-    logs_absolute_path = os.path.join(project_root, log_dir)
+    logs_absolute_path: str = os.path.join(project_root, log_dir)
 
     # Create logs directory if it doesn't exist
     os.makedirs(logs_absolute_path, exist_ok=True)
 
     # Set up log file with timestamp and component type using absolute path
-    log_filename = os.path.join(logs_absolute_path, f"{component_type}_{datetime.now().strftime('%Y-%m-%d')}.log")
+    log_filename: str = os.path.join(logs_absolute_path, f"{component_type}_{datetime.now().strftime('%Y-%m-%d')}.log")
 
     # Rest of the function remains the same
     logger = logging.getLogger(name)

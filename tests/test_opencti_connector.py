@@ -3,14 +3,16 @@ from utils.opencti_client import OpenCTIConnector
 
 
 class TestOpenCTIConnector(unittest.TestCase):
-    def setUp(self):
-        self.connector = OpenCTIConnector()
+    @classmethod
+    def setUpClass(cls):
+        # Create a single connector instance shared by all test methods
+        cls.connector = OpenCTIConnector()
         # Store created objects for cleanup and reference
-        self.created_objects = []
+        cls.created_objects = []
 
-    def tearDown(self):
-        # You could implement cleanup here to delete test objects
-        # if your OpenCTI instance allows it
+    @classmethod
+    def tearDownClass(cls):
+        # Clean up all created objects at the end of all tests
         pass
 
     def test_get_threat_actors(self):
