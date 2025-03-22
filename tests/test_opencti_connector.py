@@ -15,6 +15,27 @@ class TestOpenCTIConnector(unittest.TestCase):
         # Clean up all created objects at the end of all tests
         pass
 
+    def test_opencti_entity_availability(self):
+        """Test the availability of entities in OpenCTI"""
+        print("Checking OpenCTI entity availability...")
+        counts = self.connector.test_entity_counts(limit=10)
+
+        print("\nEntities available in your OpenCTI instance:")
+        print("--------------------------------------------")
+
+        for entity_type, count in counts.items():
+            if count == 0:
+                status = "NONE FOUND"
+            elif count == "N/A":
+                status = "UNAVAILABLE"
+            else:
+                status = f"{count} found"
+
+            print(f"{entity_type.ljust(20)}: {status}")
+
+        print("\nIf you're seeing '0' for entity types that should exist in your OpenCTI,")
+        print("there may be an issue with your API access or permissions.\n")
+
     def test_get_threat_actors(self):
         threat_actors = self.connector.get_threat_actors()
         self.assertIsNotNone(threat_actors)
