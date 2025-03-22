@@ -108,6 +108,14 @@ class OpenCTIConnector:
         """
         return self._relationship.list(entity_id=entity_id, relationship_type=relationship_type, filters=filters)
 
+    def _get_container_object_refs(self, container_id):
+        """
+        Extract object references from container entities.
+        
+        Delegates to relationship._get_container_object_refs()
+        """
+        return self._relationship._get_container_object_refs(container_id)
+
     def create_report(self, report_data):
         """
         Create a new report in OpenCTI.

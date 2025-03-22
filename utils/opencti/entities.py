@@ -271,6 +271,17 @@ class RelationshipMethods:
                 except AttributeError:
                     logger.warning("Case entity type not supported in this OpenCTI version")
                     return []
+            elif container_id.startswith("vulnerability--"):
+                logger.debug(f"Reading vulnerability: {container_id}")
+                try:
+                    if hasattr(self.client, 'vulnerability'):
+                        container = self.client.vulnerability.read(id=container_id)
+                    else:
+                        # Fallback to stix_domain_object
+                        container = self.client.stix_domain_object.read(id=container_id)
+                except Exception as e:
+                    logger.warning(f"Error reading vulnerability container: {e}")
+                    return []
             else:
                 logger.warning(f"Unsupported container type: {container_id}")
                 return []
@@ -295,7 +306,7 @@ class RelationshipMethods:
         """
         # If entity_id is provided, check if it's a container
         if entity_id:
-            if entity_id.startswith("report--") or entity_id.startswith("grouping--") or entity_id.startswith("case--"):
+            if entity_id.startswith("report--") or entity_id.startswith("grouping--") or entity_id.startswith("case--") or entity_id.startswith("vulnerability--"):
                 logger.debug(f"Entity {entity_id} is a container, getting object references")
                 return self._get_container_object_refs(entity_id)
             

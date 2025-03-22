@@ -472,6 +472,18 @@ class VulnerabilityIngestor(BaseIngestor):
                     cve_id = ref.get("external_id", "")
                     break
         
+        # Extract object references if available
+        object_refs = []
+        if "objectRefs" in vuln:
+            object_refs = vuln["objectRefs"]
+        else:
+            # Get relationships for this vulnerability
+            try:
+                related_objects = self.opencti.relationship.list(entity_id=vuln.get("id"))
+                object_refs = related_objects
+            except Exception as e:
+                logger.error(f"Error getting related objects for vulnerability {vuln.get('id')}: {e}")
+        
         # Create structured response
         structured = {
             "type": "vulnerability",
@@ -485,6 +497,8 @@ class VulnerabilityIngestor(BaseIngestor):
             "severity": severity,
             "published": vuln.get("published", vuln.get("created_at")),
             "labels": vuln.get("objectLabel", {}).get("edges", []),
+            "object_refs": object_refs,
+            "object_refs_count": len(object_refs)
         }
         
         # Include raw data if requested
