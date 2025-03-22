@@ -1,5 +1,5 @@
 from utils.logger import setup_logger
-from utils.opencti_client import OpenCTIConnector
+from utils.opencti import OpenCTIConnector
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import time

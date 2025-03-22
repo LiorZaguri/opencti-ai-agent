@@ -883,7 +883,7 @@ class TestOpenCTIIntegration(unittest.TestCase):
                 # Second call - should use cache and be faster
                 start_time = time.time()
                 second_result = ingestor.ingest_threat_actors(limit=5)
-                second_call_time = float(time.time()) - start_time
+                second_call_time = time.time() - start_time
             elif entity_type == "indicators":
                 ingestor = IndicatorIngestor(use_cache=True, cache_ttl=60)
                 # First call - should hit the API
@@ -894,7 +894,7 @@ class TestOpenCTIIntegration(unittest.TestCase):
                 # Second call - should use cache and be faster
                 start_time = time.time()
                 second_result = ingestor.ingest_indicators(limit=5)
-                second_call_time = float(time.time()) - start_time
+                second_call_time = time.time() - start_time
             elif entity_type == "observables":
                 ingestor = ObservableIngestor(use_cache=True, cache_ttl=60)
                 # First call - should hit the API
@@ -905,7 +905,7 @@ class TestOpenCTIIntegration(unittest.TestCase):
                 # Second call - should use cache and be faster
                 start_time = time.time()
                 second_result = ingestor.ingest_observables(limit=5)
-                second_call_time = float(time.time()) - start_time
+                second_call_time = time.time() - start_time
             else:
                 self.skipTest(f"No suitable ingestor available for caching test with {entity_type}")
             
@@ -914,7 +914,10 @@ class TestOpenCTIIntegration(unittest.TestCase):
 
             # Print timing for manual verification
             print(f"First call time: {first_call_time:.4f}s, Second call time: {second_call_time:.4f}s")
-            print(f"Cache speedup: {first_call_time/second_call_time:.1f}x faster")
+            if second_call_time > 0:
+                print(f"Cache speedup: {first_call_time/second_call_time:.1f}x faster")
+            else:
+                print("Second call time is 0, skipping cache speedup calculation")
         except Exception as e:
             self.fail(f"Error during caching test: {str(e)}")
 
