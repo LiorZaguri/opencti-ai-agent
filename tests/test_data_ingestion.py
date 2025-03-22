@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch, MagicMock
 import time
 import os
-from datetime import datetime, timedelta
 from utils.data_ingestion import (
     BaseIngestor, 
     ThreatActorIngestor, 
@@ -909,7 +908,6 @@ class TestOpenCTIIntegration(unittest.TestCase):
                 second_call_time = time.time() - start_time
             else:
                 self.skipTest(f"No suitable ingestor available for caching test with {entity_type}")
-                return
             
             # Verify results match
             self.assertEqual(first_result, second_result)
