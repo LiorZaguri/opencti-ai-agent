@@ -6,17 +6,38 @@ logger = setup_logger(name="OpenCTIConnector", component_type="utils")
 
 def _prepare_filters(filters):
     """
-    Ensure each filter dictionary includes default 'operator' and 'filterMode' fields.
-    Defaults: operator -> "eq", filterMode -> "in".
+    Format filters according to OpenCTI's FilterGroup structure.
+    
+    As per the documentation at https://docs.opencti.io/latest/reference/filters/
+    OpenCTI 5.12+ requires filters to be in FilterGroup format.
     """
-    prepared = []
+    if not filters:
+        return None
+        
+    # Create a proper FilterGroup structure
+    filter_group = {
+        "mode": "and",
+        "filters": [],
+        "filterGroups": []
+    }
+    
+    # Add each filter to the filters array with required fields
     for f in filters:
-        if 'operator' not in f:
-            f['operator'] = 'eq'
-        if 'filterMode' not in f:
-            f['filterMode'] = 'in'
-        prepared.append(f)
-    return prepared
+        filter_obj = {
+            "key": f["key"],
+            "values": f["values"],
+            "mode": "or"  # Default mode for multi-value filters
+        }
+        
+        # Add operator if specified
+        if "operator" in f:
+            filter_obj["operator"] = f["operator"]
+        else:
+            filter_obj["operator"] = "eq"  # Default operator
+            
+        filter_group["filters"].append(filter_obj)
+    
+    return filter_group
 
 
 class OpenCTIConnector:
@@ -28,15 +49,26 @@ class OpenCTIConnector:
         )
         logger.debug("OpenCTI connector initialized successfully")
 
-    def get_threat_actors(self, filters=None):
+    def get_threat_actors(self, filters=None, limit: int = 50):
         """Retrieve threat actors from OpenCTI."""
-        logger.debug(f"Retrieving threat actors with filters: {filters}")
+        logger.debug(f"Retrieving threat actors with filters: {filters} and limit: {limit}")
         try:
-            if filters:
-                filters = _prepare_filters(filters)
-                result = self.client.threat_actor.list(filters=filters)
+            # Try a simple direct query with no filters first
+            logger.debug("Attempting simple direct query for threat actors with no filters")
+            result = self.client.threat_actor.list(first=10)
+            if result:
+                logger.debug(f"Direct query returned {len(result)} threat actors")
             else:
-                result = self.client.threat_actor.list()
+                logger.debug("Direct query returned no threat actors")
+            
+            # Now try with filters if provided
+            if filters:
+                prepared_filters = _prepare_filters(filters)
+                logger.debug(f"Using prepared filters: {prepared_filters}")
+                result = self.client.threat_actor.list(filters=prepared_filters, first=limit)
+            else:
+                result = self.client.threat_actor.list(first=limit)
+            
             logger.debug(f"Successfully retrieved {len(result)} threat actors")
             return result
         except Exception as e:
@@ -73,6 +105,35 @@ class OpenCTIConnector:
             logger.error(f"Error retrieving observables: {str(e)}")
             return []
 
+    def get_entities(self, filters=None, first: int = 50, orderBy: str = "created_at", orderMode: str = "desc"):
+        """
+        Retrieve STIX domain objects from OpenCTI.
+        
+        This is a generic method for retrieving entities that don't have specific endpoints
+        such as vulnerabilities, reports, etc.
+        """
+        logger.debug(f"Retrieving entities with filters: {filters}, limit: {first}")
+        try:
+            if filters:
+                filters = _prepare_filters(filters)
+                result = self.client.stix_domain_object.list(
+                    filters=filters, 
+                    first=first,
+                    orderBy=orderBy,
+                    orderMode=orderMode
+                )
+            else:
+                result = self.client.stix_domain_object.list(
+                    first=first,
+                    orderBy=orderBy,
+                    orderMode=orderMode
+                )
+            logger.debug(f"Successfully retrieved {len(result)} entities")
+            return result
+        except Exception as e:
+            logger.error(f"Error retrieving entities: {str(e)}")
+            return []
+
     def _get_container_object_refs(self, container_id):
         """Extract object references from container entities like reports."""
         logger.debug(f"Getting object references for container: {container_id}")
@@ -100,45 +161,57 @@ class OpenCTIConnector:
             logger.error(f"Error retrieving container object references for {container_id}: {str(e)}")
             return []
 
-    def get_relationships(self, entity_id, relationship_type=None):
+    def get_relationships(self, entity_id=None, relationship_type=None, filters=None):
         """
-        Retrieve relationships for an entity.
-        If the entity is a container (e.g. Report, Grouping, or Case), return its objectRefs.
-        Otherwise, use the standard relationship query.
-
+        Retrieve relationships from OpenCTI.
+        
         Args:
-            entity_id (str): The STIX ID of the entity
+            entity_id (str, optional): The STIX ID of an entity to get relationships for
             relationship_type (str, optional): Filter by relationship type
-
+            filters (list, optional): Direct filters to use instead of entity_id/relationship_type
+            
         Returns:
-            list: List of relationships or object references
+            list: List of relationships
         """
-        logger.debug(f"Getting relationships for entity: {entity_id}, type: {relationship_type}")
-
-        if entity_id.startswith("report--") or entity_id.startswith("grouping--") or entity_id.startswith("case--"):
-            logger.debug(f"Entity {entity_id} is a container, getting object references")
-            return self._get_container_object_refs(entity_id)
-        else:
-            try:
+        # If entity_id is provided, check if it's a container
+        if entity_id:
+            if entity_id.startswith("report--") or entity_id.startswith("grouping--") or entity_id.startswith("case--"):
+                logger.debug(f"Entity {entity_id} is a container, getting object references")
+                return self._get_container_object_refs(entity_id)
+            
+            # Entity is not a container, build filters
+            if not filters:
                 filters = [{
                     'key': 'fromId',
-                    'values': [entity_id],
-                    'operator': 'eq',
-                    'filterMode': 'in'
+                    'values': [entity_id]
                 }]
+            
                 if relationship_type:
                     filters.append({
                         'key': 'relationship_type',
-                        'values': [relationship_type],
-                        'operator': 'eq',
-                        'filterMode': 'in'
+                        'values': [relationship_type]
                     })
+        
+        # Use the provided filters or the built ones
+        if filters:
+            try:
                 logger.debug(f"Retrieving relationships with filters: {filters}")
+                filters = _prepare_filters(filters)
                 result = self.client.stix_core_relationship.list(filters=filters)
-                logger.debug(f"Found {len(result)} relationships for entity {entity_id}")
+                logger.debug(f"Found {len(result)} relationships")
                 return result
             except Exception as e:
-                logger.error(f"Error retrieving relationships for {entity_id}: {str(e)}")
+                logger.error(f"Error retrieving relationships: {str(e)}")
+                return []
+        else:
+            # No filters, just get all relationships
+            try:
+                logger.debug("Retrieving all relationships")
+                result = self.client.stix_core_relationship.list()
+                logger.debug(f"Found {len(result)} relationships")
+                return result
+            except Exception as e:
+                logger.error(f"Error retrieving relationships: {str(e)}")
                 return []
 
     def create_report(self, report_data):
@@ -162,3 +235,26 @@ class OpenCTIConnector:
         except Exception as e:
             logger.error(f"Error creating indicator: {str(e)}")
             return None
+
+    def test_entity_counts(self, limit=10):
+        """
+        Debug method to count different entity types available through the API.
+        """
+        try:
+            results = {
+                "all_entities": len(self.client.stix_domain_object.list(first=100)),
+                "threat_actors": len(self.client.threat_actor.list(first=limit)),
+                "indicators": len(self.client.indicator.list(first=limit)),
+                "observables": len(self.client.stix_cyber_observable.list(first=limit)),
+                "vulnerabilities": len(self.client.vulnerability.list(first=limit)) if hasattr(self.client, 'vulnerability') else "N/A",
+                "reports": len(self.client.report.list(first=limit)),
+                "malwares": len(self.client.malware.list(first=limit)),
+                "intrusion_sets": len(self.client.intrusion_set.list(first=limit)),
+                "attack_patterns": len(self.client.attack_pattern.list(first=limit)),
+                "relationships": len(self.client.stix_core_relationship.list(first=limit)),
+            }
+            logger.debug(f"Entity counts in OpenCTI: {results}")
+            return results
+        except Exception as e:
+            logger.error(f"Error counting entities: {str(e)}")
+            return {}
