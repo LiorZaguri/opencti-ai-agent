@@ -7,18 +7,9 @@ from utils.logger import setup_logger
 from memory.cache_manager import get_agent_cache
 from utils.token_usage import TokenUsage
 from abc import ABC, abstractmethod
-
+from utils.company_profile import load_company_profile
 logger = setup_logger(name="base_agent", component_type="agents")
 token_tracker = TokenUsage()
-
-
-async def load_company_profile():
-    path = os.path.join("data", "company_profile.json")
-    if os.path.exists(path):
-        with open(path, "r") as f:
-            return json.load(f)
-    return {}
-
 
 class BaseAgent(ConversableAgent, ABC):
     """
@@ -68,16 +59,16 @@ class BaseAgent(ConversableAgent, ABC):
         if context is None:
             context = {}
         logger.info("-" * 60)
-        logger.info(f"[{self.name}] Running task: {task}")
+        logger.info(f"[{self.name}] Running task: {task:[100]}")
 
         # Check cache
         if self.use_cache and self._cache.has(task, self.name):
             result = self._cache.get(task, self.name)
-            logger.debug(f"[{self.name}] Cache hit for task: {task}")
+            logger.debug(f"[{self.name}] Cache hit for task: {task:[100]}")
             return result
 
         # Cache miss → handle the task
-        logger.debug(f"[{self.name}] Cache miss, executing task: {task}")
+        logger.debug(f"[{self.name}] Cache miss, executing task: {task:[100]}")
         result = await self.handle_task(task, context)
 
         # Track token usage estimate
@@ -88,7 +79,7 @@ class BaseAgent(ConversableAgent, ABC):
         # Save to cache
         if self.use_cache:
             self._cache.save(task, self.name, result)
-            logger.debug(f"[{self.name}] Cached result for task: {task}")
+            logger.debug(f"[{self.name}] Cached result for task: {task:[100]}")
 
         return result
 
