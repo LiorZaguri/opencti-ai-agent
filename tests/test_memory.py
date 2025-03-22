@@ -3,15 +3,17 @@ import shutil
 import tempfile
 import threading
 import unittest
-from memory.cache_store import CacheStore
-import memory.cache_manager as cache_manager
+import json
+
+import utils.memory.cache_manager as cache_manager
+from utils.memory.cache_store import CacheStore
 
 TEST_CACHE_DIR = "tests/test_memory/"
 
 class TestCacheStore(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory for cache files
-        self.test_dir = tempfile.mkdtemp()
+        self.test_dir = TEST_CACHE_DIR
         self.cache_path = os.path.join(self.test_dir, "test_cache.json")
         self.cache = CacheStore(cache_path=self.cache_path)
 

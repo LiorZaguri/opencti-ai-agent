@@ -1,5 +1,5 @@
 import os
-from memory.cache_store import CacheStore
+from utils.memory.cache_store import CacheStore
 import threading
 from utils.logger import setup_logger
 
@@ -10,7 +10,7 @@ logger = setup_logger(name="CacheManager", component_type="memory")
 _registry_lock = threading.Lock()
 
 # Use a shared cache file for all agents (can scale later)
-SHARED_CACHE_PATH = "memory/cache/shared_cache.json"
+SHARED_CACHE_PATH = "utils/memory/cache/shared_cache.json"
 _shared_cache = CacheStore(cache_path=SHARED_CACHE_PATH)
 
 # Registry for flexibility if future per-agent caches are needed
@@ -47,8 +47,8 @@ def register_cache(alias: str, cache_path: str = None) -> CacheStore:
             return _cache_registry[alias]
 
         if cache_path is None:
-            # Store all cache files in the memory/cache directory
-            cache_dir = "memory/cache"
+            # Store all cache files in the utils/memory/cache directory
+            cache_dir = "utils/memory/cache"
             os.makedirs(cache_dir, exist_ok=True)
             cache_path = f"{cache_dir}/{alias}_cache.json"
 
@@ -84,3 +84,15 @@ def get_cache_registry() -> dict:
     with _registry_lock:
         logger.debug("Retrieved cache registry copy")
         return _cache_registry.copy()
+        
+        
+def initialize_cache():
+    """
+    Ensure the cache directory is created and initialize the cache system.
+    Should be called during application startup.
+    """
+    cache_dir = os.path.dirname(SHARED_CACHE_PATH)
+    os.makedirs(cache_dir, exist_ok=True)
+    logger.info(f"Cache directory initialized at {cache_dir}")
+    # The shared cache is already initialized at module level
+    return _shared_cache 

@@ -10,7 +10,7 @@ from utils.logger import setup_logger
 logger = setup_logger(name="CacheStore", component_type="memory")
 
 # Default path for persistent cache file
-CACHE_FILE_PATH = "memory/cache/shared_cache.json"
+CACHE_FILE_PATH = "utils/memory/cache/shared_cache.json"
 
 class CacheStore:
     """
@@ -110,4 +110,4 @@ class CacheStore:
                 self._save_cache()
                 logger.debug(f"Removed cache entry for agent '{agent_name}', key hash: {key[:8]}...")
                 return True
-            return False
+            return False 

@@ -4,10 +4,11 @@ from autogen import ConversableAgent
 from config.model_configs import default_config_list, default_llm_config
 from typing import Any, Dict
 from utils.logger import setup_logger
-from memory.cache_manager import get_agent_cache
+from utils.memory.cache_manager import get_agent_cache
 from utils.token_usage import TokenUsage
 from abc import ABC, abstractmethod
 from utils.company_profile import load_company_profile
+
 logger = setup_logger(name="base_agent", component_type="agents")
 token_tracker = TokenUsage()
 
@@ -50,8 +51,13 @@ class BaseAgent(ConversableAgent, ABC):
                     f"(cache: {use_cache})")
 
     async def async_init(self):
-        """Async initialization to load resources"""
-        self.company_profile = await load_company_profile()
+        """
+        Async initialization method.
+        
+        Override this in derived classes for async initialization.
+        Returns self for method chaining.
+        """
+        self.company_profile = load_company_profile()
         return self
 
     async def execute_task(self, task: str, context=None) -> str:
@@ -59,16 +65,16 @@ class BaseAgent(ConversableAgent, ABC):
         if context is None:
             context = {}
         logger.info("-" * 60)
-        logger.info(f"[{self.name}] Running task: {task:[100]}")
+        logger.info(f"[{self.name}] Running task: {task:.100}")
 
         # Check cache
         if self.use_cache and self._cache.has(task, self.name):
             result = self._cache.get(task, self.name)
-            logger.debug(f"[{self.name}] Cache hit for task: {task:[100]}")
+            logger.debug(f"[{self.name}] Cache hit for task: {task:100}")
             return result
 
         # Cache miss → handle the task
-        logger.debug(f"[{self.name}] Cache miss, executing task: {task:[100]}")
+        logger.debug(f"[{self.name}] Cache miss, executing task: {task:100}")
         result = await self.handle_task(task, context)
 
         # Track token usage estimate
@@ -79,7 +85,7 @@ class BaseAgent(ConversableAgent, ABC):
         # Save to cache
         if self.use_cache:
             self._cache.save(task, self.name, result)
-            logger.debug(f"[{self.name}] Cached result for task: {task:[100]}")
+            logger.debug(f"[{self.name}] Cached result for task: {task:100}")
 
         return result
 
