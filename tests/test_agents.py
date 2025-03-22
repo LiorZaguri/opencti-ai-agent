@@ -1,9 +1,10 @@
-import unittest
-from unittest.mock import patch, MagicMock
-import tempfile
-import shutil
-import os
 import asyncio
+import os
+import shutil
+import tempfile
+import unittest
+from unittest.mock import patch
+
 from agents.base_agent import BaseAgent
 from memory.cache_manager import clear_all_caches
 
