@@ -11,7 +11,8 @@ from abc import ABC, abstractmethod
 logger = setup_logger(name="base_agent", component_type="agents")
 token_tracker = TokenUsage()
 
-def load_company_profile():
+
+async def load_company_profile():
     path = os.path.join("data", "company_profile.json")
     if os.path.exists(path):
         with open(path, "r") as f:
@@ -24,18 +25,19 @@ class BaseAgent(ConversableAgent, ABC):
     Base class for all AI agents. Uses default LLM config unless overridden.
     Integrates logging, caching, and token usage tracking.
     """
+
     def __init__(
-        self,
-        name: str,
-        system_message: str = "",
-        config_list: list = None,
-        llm_config: Dict[str, Any] = None,
-        use_cache: bool = True,
-        **kwargs
+            self,
+            name: str,
+            system_message: str = "",
+            config_list: list = None,
+            llm_config: Dict[str, Any] = None,
+            use_cache: bool = True,
+            **kwargs
     ):
         self.use_cache = use_cache
         self._cache = get_agent_cache(name) if use_cache else None
-        self.company_profile = load_company_profile()
+        self.company_profile = {}  # Will be populated in async init
         if not system_message:
             system_message = self.generate_default_system_prompt()
 
@@ -53,10 +55,15 @@ class BaseAgent(ConversableAgent, ABC):
             llm_config=llm_config,
             **kwargs
         )
-        logger.info(f"Initialized agent: {name} cache enabled: {use_cache} with token limit: "
-                    f"{token_tracker.get_agent_limit(self.name)}")
+        logger.info(f"Initialized agent: {name} with token limit: {token_tracker.get_agent_limit(self.name)} "
+                    f"(cache: {use_cache})")
 
-    def execute_task(self, task: str, context=None) -> str:
+    async def async_init(self):
+        """Async initialization to load resources"""
+        self.company_profile = await load_company_profile()
+        return self
+
+    async def execute_task(self, task: str, context=None) -> str:
         """Execute a task with caching and token tracking support"""
         if context is None:
             context = {}
@@ -71,7 +78,7 @@ class BaseAgent(ConversableAgent, ABC):
 
         # Cache miss → handle the task
         logger.debug(f"[{self.name}] Cache miss, executing task: {task}")
-        result = self.handle_task(task, context)
+        result = await self.handle_task(task, context)
 
         # Track token usage estimate
         prompt_tokens = token_tracker.estimate_tokens(task)
@@ -86,7 +93,7 @@ class BaseAgent(ConversableAgent, ABC):
         return result
 
     @abstractmethod
-    def handle_task(self, task: str, context: Dict[str, Any]) -> str:
+    async def handle_task(self, task: str, context: Dict[str, Any]) -> str:
         """
         Process a specific task and return the result.
         Must be implemented by subclasses.
@@ -97,4 +104,5 @@ class BaseAgent(ConversableAgent, ABC):
         profile = self.company_profile
         industry = profile.get("industry", "unknown sector")
         region = profile.get("region", "global")
-        return f"You are an AI agent specialized in threats for the {industry} industry, operating in the {region} region. Act accordingly."
+        return (f"You are an AI agent specialized in threats for the {industry} industry, "
+                f"operating in the {region} region. Act accordingly.")
