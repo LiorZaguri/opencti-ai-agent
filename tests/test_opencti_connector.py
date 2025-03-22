@@ -1,5 +1,5 @@
 import unittest
-from utils.opencti_client import OpenCTIConnector
+from utils.opencti import OpenCTIConnector
 
 
 class TestOpenCTIConnector(unittest.TestCase):
@@ -62,7 +62,6 @@ class TestOpenCTIConnector(unittest.TestCase):
         self.assertIsNotNone(created_report)
         self.created_objects.append(created_report['id'])
         print(f"Created Report: {created_report}")
-        return created_report
 
     def test_create_indicator(self):
         dummy_indicator_data = {
@@ -77,7 +76,6 @@ class TestOpenCTIConnector(unittest.TestCase):
         self.assertIsNotNone(created_indicator)
         self.created_objects.append(created_indicator['id'])
         print(f"Created Indicator: {created_indicator}")
-        return created_indicator
 
 
 if __name__ == '__main__':
