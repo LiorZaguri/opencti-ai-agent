@@ -4,8 +4,8 @@ import tempfile
 import threading
 import unittest
 
-import utils.memory.cache_manager as cache_manager
-from utils.memory.cache_store import CacheStore
+import memory as cache_manager
+from memory import CacheStore
 
 TEST_CACHE_DIR = "tests/test_memory/"
 

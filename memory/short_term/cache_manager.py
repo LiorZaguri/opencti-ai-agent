@@ -1,5 +1,5 @@
 import os
-from utils.memory.cache_store import CacheStore
+from memory.short_term.cache_store import CacheStore
 import threading
 from utils.logger import setup_logger
 

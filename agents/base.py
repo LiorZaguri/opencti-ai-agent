@@ -2,7 +2,7 @@ from autogen import ConversableAgent
 from config.model_configs import default_config_list, default_llm_config
 from typing import Any, Dict
 from utils.logger import setup_logger
-from utils.memory.cache_manager import get_agent_cache
+from memory import get_agent_cache
 from utils.token_usage import TokenUsage
 from abc import ABC, abstractmethod
 from utils.company_profile import load_company_profile
