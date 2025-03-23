@@ -3,7 +3,7 @@ from config.model_configs import default_config_list, default_llm_config
 from typing import Any, Dict
 from utils.logger import setup_logger
 from memory import get_agent_cache
-from utils.token_usage import TokenUsage
+from core.token_usage.token_usage import TokenUsage, get_agent_limit
 from abc import ABC, abstractmethod
 from utils.company_profile import load_company_profile
 
@@ -45,7 +45,7 @@ class BaseAgent(ConversableAgent, ABC):
             llm_config=llm_config,
             **kwargs
         )
-        logger.info(f"Initialized agent: {name} with token limit: {token_tracker.get_agent_limit(self.name)} "
+        logger.info(f"Initialized agent: {name} with token limit: {get_agent_limit(self.name)} "
                     f"(cache: {use_cache})")
 
     async def async_init(self):
@@ -75,10 +75,16 @@ class BaseAgent(ConversableAgent, ABC):
         logger.debug(f"[{self.name}] Cache miss, executing task: {task:100}")
         result = await self.handle_task(task, context)
 
-        # Track token usage estimate
-        prompt_tokens = token_tracker.estimate_tokens(task)
-        result_tokens = token_tracker.estimate_tokens(result)
-        token_tracker.log_tokens(self.name, prompt_tokens, result_tokens)
+        # Track token usage estimate - ensure task and result are strings
+        task_str = str(task) if task is not None else ""
+        result_str = str(result) if result is not None else ""
+        
+        try:
+            prompt_tokens = token_tracker.estimate_tokens(task_str)
+            result_tokens = token_tracker.estimate_tokens(result_str)
+            token_tracker.log_tokens(self.name, prompt_tokens, result_tokens)
+        except Exception as e:
+            logger.error(f"[{self.name}] Error tracking tokens: {e}")
 
         # Save to cache
         if self.use_cache:
