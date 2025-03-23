@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from agents.base_agent import BaseAgent
+from agents.base import BaseAgent
 from utils.memory.cache_manager import clear_all_caches
 
 
@@ -49,7 +49,7 @@ class TestBaseAgent(unittest.TestCase):
         self.assertEqual(agent2.system_message, "Custom message")
         self.assertFalse(agent2.use_cache)
 
-    @patch('agents.base_agent.logger')
+    @patch('agents.base.logger')
     def test_logging(self, mock_logger):
         agent = TestAgent(name="logging_agent")
         # Check initialization log

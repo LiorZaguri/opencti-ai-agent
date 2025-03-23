@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import threading
 import unittest
-import json
 
 import utils.memory.cache_manager as cache_manager
 from utils.memory.cache_store import CacheStore
