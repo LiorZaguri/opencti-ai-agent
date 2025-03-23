@@ -4,10 +4,10 @@ import tempfile
 import threading
 import unittest
 
-import memory as cache_manager
-from memory import CacheStore
+import memory.short_term.cache_manager as cache_manager
+from memory.short_term.cache_store import CacheStore
 
-TEST_CACHE_DIR = "tests/test_memory/"
+TEST_CACHE_DIR = "data/logs/test_memory/"
 
 class TestCacheStore(unittest.TestCase):
     def setUp(self):

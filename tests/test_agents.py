@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from agents.base import BaseAgent
-from memory import clear_all_caches
+from memory.short_term.cache_manager import clear_all_caches
 
 
 # Concrete implementation of BaseAgent for testing
