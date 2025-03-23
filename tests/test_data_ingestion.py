@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import time
 import os
-from utils.data_ingestion import (
+from data_pipeline.ingestion.opencti_ingestion import (
     BaseIngestor, 
     ThreatActorIngestor, 
     IndicatorIngestor,
@@ -65,7 +65,7 @@ class TestThreatActorIngestor(unittest.TestCase):
     """Test the ThreatActorIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('utils.data_ingestion.OpenCTIConnector')
+        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -95,7 +95,7 @@ class TestThreatActorIngestor(unittest.TestCase):
         self.patcher.stop()
         clear_all_caches()
     
-    @patch('utils.data_ingestion.load_company_profile')
+    @patch('data_pipeline.ingestion.opencti_ingestion.load_company_profile')
     def test_ingest_threat_actors(self, mock_profile):
         """Test basic threat actor ingestion"""
         # Mock company profile
@@ -130,7 +130,7 @@ class TestThreatActorIngestor(unittest.TestCase):
         self.mock_connector_instance.get_threat_actors.assert_not_called()  # Should use cache
         self.assertEqual(result, second_result)
     
-    @patch('utils.data_ingestion.load_company_profile')
+    @patch('data_pipeline.ingestion.opencti_ingestion.load_company_profile')
     def test_empty_threat_actors(self, mock_profile):
         """Test handling of empty threat actor list"""
         mock_profile.return_value = {"industry": "healthcare"}
@@ -146,7 +146,7 @@ class TestIndicatorIngestor(unittest.TestCase):
     """Test the IndicatorIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('utils.data_ingestion.OpenCTIConnector')
+        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -273,7 +273,7 @@ class TestObservableIngestor(unittest.TestCase):
     """Test the ObservableIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('utils.data_ingestion.OpenCTIConnector')
+        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -345,7 +345,7 @@ class TestVulnerabilityIngestor(unittest.TestCase):
     """Test the VulnerabilityIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('utils.data_ingestion.OpenCTIConnector')
+        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -434,7 +434,7 @@ class TestReportIngestor(unittest.TestCase):
     """Test the ReportIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('utils.data_ingestion.OpenCTIConnector')
+        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -505,12 +505,6 @@ class TestReportIngestor(unittest.TestCase):
         ingestor = ReportIngestor()
         result = ingestor.ingest_reports()
         
-        # Verify get_entities was called with correct parameters
-        expected_filters = [
-            {'key': 'published', 'values': ['2021-01-01T00:00:00Z'], 'operator': 'gt'},
-            {'key': 'entity_type', 'values': ['Report']}
-        ]
-        
         # Check that both filters are present (order might vary)
         self.mock_connector_instance.get_entities.assert_called_once()
         call_args = self.mock_connector_instance.get_entities.call_args
@@ -532,7 +526,7 @@ class TestRelationshipIngestor(unittest.TestCase):
     """Test the RelationshipIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('utils.data_ingestion.OpenCTIConnector')
+        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -844,7 +838,6 @@ class TestOpenCTIIntegration(unittest.TestCase):
         
         if not indicators:
             self.skipTest("No indicators available for pattern testing")
-            return  # Add explicit return to prevent further execution
             
         # Check that at least some indicators have extracted values
         values_found = False
