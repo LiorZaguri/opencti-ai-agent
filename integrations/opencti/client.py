@@ -7,7 +7,7 @@ This module provides the main OpenCTIConnector class for interacting with the Op
 from pycti import OpenCTIApiClient
 from config.settings import OPENCTI_BASE_URL, OPENCTI_API_KEY
 from utils.logger import setup_logger
-from utils.opencti.entities import (
+from integrations.opencti.entities import (
     ThreatActorMethods,
     IndicatorMethods,
     ObservableMethods,

@@ -1,5 +1,5 @@
 import unittest
-from utils.opencti import OpenCTIConnector
+from integrations.opencti import OpenCTIConnector
 
 
 class TestOpenCTIConnector(unittest.TestCase):
