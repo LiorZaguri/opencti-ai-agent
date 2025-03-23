@@ -3,12 +3,10 @@ import os
 from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 from config.settings import LOG_LEVEL
-from typing import Union, Optional
-
 
 def setup_logger(
         name: str = "CTIAgentLogger",
-        log_dir: str = "logs",
+        log_dir: str = "data/logs",
         component_type: str = "system",
         console_level: int = getattr(logging, LOG_LEVEL),
         file_level: int = logging.DEBUG,
