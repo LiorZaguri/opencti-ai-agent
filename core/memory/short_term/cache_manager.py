@@ -1,7 +1,7 @@
 import os
 from core.memory.short_term.cache_store import CacheStore
 import threading
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 
 # Create a memory-specific logger
 logger = setup_logger(name="CacheManager", component_type="memory")

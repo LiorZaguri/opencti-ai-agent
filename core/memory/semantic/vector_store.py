@@ -5,7 +5,7 @@ This module provides functionality for storing and retrieving vector embeddings
 for semantic search across agent knowledge.
 """
 
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 from typing import List, Dict, Any
 
 logger = setup_logger(name="VectorStore", component_type="memory")

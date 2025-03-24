@@ -4,7 +4,7 @@ import hashlib
 import tempfile
 from threading import Lock
 from typing import Optional
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 
 # Create a memory-specific logger
 logger = setup_logger(name="CacheStore", component_type="memory")

@@ -12,7 +12,7 @@ from data_pipeline.ingestion.opencti_ingestion import (
     RelationshipIngestor,
     clear_all_caches
 )
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 
 
 logger = setup_logger(name="testDataIngestion", component_type="utils")

@@ -1,8 +1,7 @@
 import re
-import os
 from pathlib import Path
 from typing import Union
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 
 logger = setup_logger(name="token_usage", component_type="token_validators")
 

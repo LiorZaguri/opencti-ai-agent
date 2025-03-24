@@ -5,7 +5,7 @@ This module provides functionality for logging and retrieving agent experiences
 for learning and improving agent responses over time.
 """
 
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 
 logger = setup_logger(name="ExperienceLog", component_type="memory")
 

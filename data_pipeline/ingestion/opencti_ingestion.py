@@ -1,10 +1,10 @@
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 from integrations.opencti import OpenCTIConnector
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import time
 import re
-from utils.company_profile import load_company_profile
+from core.utils.company_profile import load_company_profile
 
 logger = setup_logger(name="threat_ingestor", component_type="utils")
 

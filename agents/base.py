@@ -1,11 +1,11 @@
 from autogen import ConversableAgent
 from config.model_configs import default_config_list, default_llm_config
 from typing import Any, Dict
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 from core.memory import get_agent_cache
 from core.token_usage.token_usage import TokenUsage, get_agent_limit
 from abc import ABC, abstractmethod
-from utils.company_profile import load_company_profile
+from core.utils.company_profile import load_company_profile
 
 logger = setup_logger(name="base_agent", component_type="agents")
 token_tracker = TokenUsage()

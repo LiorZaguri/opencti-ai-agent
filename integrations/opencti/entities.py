@@ -5,7 +5,7 @@ This module contains methods for working with specific STIX entity types in Open
 such as threat actors, indicators, observables, etc.
 """
 
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 from integrations.opencti.filters import prepare_filters
 
 logger = setup_logger(name="OpenCTI_Entities", component_type="utils")

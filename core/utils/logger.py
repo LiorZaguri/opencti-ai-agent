@@ -14,7 +14,7 @@ def setup_logger(
 ) -> logging.Logger:
     """Configure and return a logger with file and console handlers."""
     # Get the project root directory (assuming this file is in utils/ directory)
-    project_root: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    project_root: str = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     # Create absolute path to logs directory in project root
     logs_absolute_path: str = os.path.join(project_root, log_dir)

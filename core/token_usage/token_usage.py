@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 
 from config.settings import AGENT_DEFAULT_TOKEN_LIMIT, SYSTEM_DAILY_TOKEN_LIMIT
-from utils.logger import setup_logger
+from core.utils.logger import setup_logger
 
 from .models import TokenStats
 from .storage import TokenUsageStorage
