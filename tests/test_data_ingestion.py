@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import time
 import os
-from data_pipeline.ingestion.opencti_ingestion import (
+from core.data_pipeline.ingestion.opencti_ingestion import (
     BaseIngestor, 
     ThreatActorIngestor, 
     IndicatorIngestor,
@@ -65,7 +65,7 @@ class TestThreatActorIngestor(unittest.TestCase):
     """Test the ThreatActorIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
+        self.patcher = patch('core.data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -95,7 +95,7 @@ class TestThreatActorIngestor(unittest.TestCase):
         self.patcher.stop()
         clear_all_caches()
     
-    @patch('data_pipeline.ingestion.opencti_ingestion.load_company_profile')
+    @patch('core.data_pipeline.ingestion.opencti_ingestion.load_company_profile')
     def test_ingest_threat_actors(self, mock_profile):
         """Test basic threat actor ingestion"""
         # Mock company profile
@@ -130,7 +130,7 @@ class TestThreatActorIngestor(unittest.TestCase):
         self.mock_connector_instance.get_threat_actors.assert_not_called()  # Should use cache
         self.assertEqual(result, second_result)
     
-    @patch('data_pipeline.ingestion.opencti_ingestion.load_company_profile')
+    @patch('core.data_pipeline.ingestion.opencti_ingestion.load_company_profile')
     def test_empty_threat_actors(self, mock_profile):
         """Test handling of empty threat actor list"""
         mock_profile.return_value = {"industry": "healthcare"}
@@ -146,7 +146,7 @@ class TestIndicatorIngestor(unittest.TestCase):
     """Test the IndicatorIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
+        self.patcher = patch('core.data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -273,7 +273,7 @@ class TestObservableIngestor(unittest.TestCase):
     """Test the ObservableIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
+        self.patcher = patch('core.data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -345,7 +345,7 @@ class TestVulnerabilityIngestor(unittest.TestCase):
     """Test the VulnerabilityIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
+        self.patcher = patch('core.data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -434,7 +434,7 @@ class TestReportIngestor(unittest.TestCase):
     """Test the ReportIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
+        self.patcher = patch('core.data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
@@ -526,7 +526,7 @@ class TestRelationshipIngestor(unittest.TestCase):
     """Test the RelationshipIngestor class with mocked OpenCTI data"""
     
     def setUp(self):
-        self.patcher = patch('data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
+        self.patcher = patch('core.data_pipeline.ingestion.opencti_ingestion.OpenCTIConnector')
         self.mock_opencti = self.patcher.start()
         
         # Mock instance of the OpenCTI connector
