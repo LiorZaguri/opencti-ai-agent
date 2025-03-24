@@ -1,9 +1,11 @@
-from config.settings import OPENAI_API_KEY, OPENAI_BASE_MODEL
+from config.settings import LLM_API_KEY, LLM_BASE_MODEL, LLM_API_URL
 
 default_config_list = [
     {
-        "model": OPENAI_BASE_MODEL,
-        "api_key": OPENAI_API_KEY
+        "model": LLM_BASE_MODEL,
+        "api_key": LLM_API_KEY,
+        "base_url": LLM_API_URL,
+        "api_type": "openai",
     }
 ]
 
