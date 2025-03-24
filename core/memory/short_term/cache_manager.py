@@ -1,5 +1,5 @@
 import os
-from memory.short_term.cache_store import CacheStore
+from core.memory.short_term.cache_store import CacheStore
 import threading
 from utils.logger import setup_logger
 
@@ -10,7 +10,7 @@ logger = setup_logger(name="CacheManager", component_type="memory")
 _registry_lock = threading.Lock()
 
 # Use a shared cache file for all agents (can scale later)
-SHARED_CACHE_PATH = "utils/memory/cache/shared_cache.json"
+SHARED_CACHE_PATH = "data/cache/shared_cache.json"
 _shared_cache = CacheStore(cache_path=SHARED_CACHE_PATH)
 
 # Registry for flexibility if future per-agent caches are needed
@@ -47,8 +47,8 @@ def register_cache(alias: str, cache_path: str = None) -> CacheStore:
             return _cache_registry[alias]
 
         if cache_path is None:
-            # Store all cache files in the utils/memory/cache directory
-            cache_dir = "utils/memory/cache"
+            # Store all cache files in the data/cache directory
+            cache_dir = "data/cache"
             os.makedirs(cache_dir, exist_ok=True)
             cache_path = f"{cache_dir}/{alias}_cache.json"
 
