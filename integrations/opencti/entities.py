@@ -257,6 +257,11 @@ class RelationshipMethods:
         """
         logger.debug(f"Getting object references for container: {container_id}")
         try:
+            container = None # Initialize container as None
+            identified_type = None
+            read_entity_data = None
+            
+            # --- Try reading based on prefix --- 
             if container_id.startswith("report--"):
                 logger.debug(f"Reading report: {container_id}")
                 container = self.client.report.read(id=container_id)
@@ -276,19 +281,58 @@ class RelationshipMethods:
                     if hasattr(self.client, 'vulnerability'):
                         container = self.client.vulnerability.read(id=container_id)
                     else:
-                        # Fallback to stix_domain_object
                         container = self.client.stix_domain_object.read(id=container_id)
                 except Exception as e:
                     logger.warning(f"Error reading vulnerability container: {e}")
-                    return []
+                    # container remains None
             else:
-                logger.warning(f"Unsupported container type: {container_id}")
+                # --- Handle unsupported prefix --- 
+                logger.debug(f"Container ID {container_id} has unsupported prefix, attempting generic read.")
+                try:
+                    # Try reading generically
+                    unknown_entity = self.client.stix_domain_object.read(id=container_id)
+                    if unknown_entity and isinstance(unknown_entity, dict):
+                        identified_type = unknown_entity.get("entity_type")
+                        read_entity_data = unknown_entity
+                        logger.info(f"Identified unsupported prefix ID {container_id} as type: {identified_type}")
+                    else:
+                         # Fallback core object read
+                         unknown_entity_core = self.client.stix_core_object.read(id=container_id)
+                         if unknown_entity_core and isinstance(unknown_entity_core, dict):
+                            identified_type = unknown_entity_core.get("entity_type")
+                            read_entity_data = unknown_entity_core
+                            logger.info(f"Identified unsupported prefix ID {container_id} as type (via core): {identified_type}")
+                         else:
+                            logger.warning(f"Could not read or identify entity type for ID with unsupported prefix: {container_id}")
+                except Exception as read_err:
+                    logger.error(f"Error trying to read entity with unsupported prefix {container_id}: {read_err}")
+                
+                # If identified as Report, assign data to container variable for unified processing below
+                if identified_type == "Report" and read_entity_data:
+                    logger.info(f"Treating {container_id} as Report based on identified type.")
+                    container = read_entity_data 
+                # If not identified as Report or read failed, container remains None
+                elif identified_type:
+                     logger.warning(f"Unsupported container type {identified_type} found for ID {container_id}. Cannot extract refs.")
+                # No need for explicit return [] here, handled by the check below
+
+            # --- MOVED CHECK: Ensure container is valid before accessing --- 
+            if container is None:
+                logger.warning(f"Could not read or process container entity with ID: {container_id}. Cannot extract refs.")
                 return []
+            
+            # Now container is guaranteed to be not None (it's a dict from read or read_entity_data)
             object_refs = container.get("objectRefs", [])
-            logger.debug(f"Found {len(object_refs)} object references in container {container_id}")
+            logger.debug(f"Found {len(object_refs)} object references in container {container_id} (type: {container.get('entity_type', 'Unknown')})")
+            
+            # Ensure object_refs is always a list
+            if not isinstance(object_refs, list):
+                logger.warning(f"objectRefs field in container {container_id} is not a list, type: {type(object_refs)}. Returning empty list.")
+                return []
             return object_refs
+            
         except Exception as e:
-            logger.error(f"Error retrieving container object references for {container_id}: {str(e)}")
+            logger.error(f"Error retrieving container object references for {container_id}: {str(e)}", exc_info=True)
             return []
         
     def list(self, entity_id=None, relationship_type=None, filters=None):
