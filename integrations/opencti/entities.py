@@ -218,18 +218,15 @@ class ReportMethods:
         Create a new report in OpenCTI.
         
         Args:
-            report_data: Dictionary of report properties
-            
+            report_data: Dictionary containing report properties
         Returns:
             The created report object or None on error
         """
         logger.info(f"Creating new report: {report_data.get('name', 'unnamed')}")
         try:
-            result = self.client.report.create(**report_data)
-            logger.info(f"Successfully created report with ID: {result.get('id')}")
-            return result
+            return self.client.report.create(**report_data)
         except Exception as e:
-            logger.error(f"Error creating report: {str(e)}")
+            logger.error(f"Error in ReportMethods.create: {str(e)}")
             return None
             
             

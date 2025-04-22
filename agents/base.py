@@ -1,262 +1,221 @@
-from autogen import ConversableAgent
-from config.model_configs import default_config_list, default_llm_config
-from typing import Any, Dict, List, Optional, Union
-from core.utils.logger import setup_logger
-from core.memory import get_agent_cache
-from core.token_usage.token_usage import TokenUsage, get_agent_limit
-from abc import ABC, abstractmethod
-from core.utils.company_profile import load_company_profile
-import asyncio
+import os
+import sys
+from typing import Callable, Dict, Any, List, Optional, Set
 
-logger = setup_logger(name="base_agent", component_type="agents")
-token_tracker = TokenUsage()
+# Add the project root directory to Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-class BaseAgent(ConversableAgent, ABC):
+from autogen import (
+    ConversableAgent,
+    UpdateSystemMessage
+)
+from config.model_configs import default_llm_config
+from agents.tools import get_tool_function, get_tool_description, get_tool_parameters
+
+class BaseAgent:
     """
-    Base class for all AI agents in the OpenCTI ecosystem. Uses default LLM config unless overridden.
-    Integrates logging, caching, token usage tracking, and inter-agent communication.
+    Base class for all agents in the CTI AI Agent system.
+    This class provides common functionality and can be extended to create specialized agents.
     """
-
-    # Class-level registry to enable agent discovery
-    _registry = {}
 
     def __init__(
-            self,
-            name: str,
-            system_message: str = "",
-            config_list: list = None,
-            llm_config: Dict[str, Any] = None,
-            use_cache: bool = True,
-            description: str = "",
-            **kwargs
+        self,
+        name: str,
+        system_message: str,
+        llm_config: Optional[Dict[str, Any]] = None,
+        update_function: Optional[Callable] = None,
+        human_input_mode: str = "NEVER",
+        tools: Optional[List[str]] = None
     ):
-        self.use_cache = use_cache
-        self._cache = get_agent_cache(name) if use_cache else None
-        self.company_profile = {}  # Will be populated in async init
-        self.description = description
-        self._collaborators = {}
-        
-        if not system_message:
-            system_message = self.generate_default_system_prompt()
+        """
+        Initialize a new agent.
 
-        # Prepare configuration
-        llm_config = llm_config or default_llm_config.copy()
+        Args:
+            name: The name of the agent
+            system_message: The system message that defines the agent's role and capabilities
+            llm_config: Configuration for the language model
+            update_function: Function to call when updating the agent's state
+            human_input_mode: Mode for human input ("NEVER", "ALWAYS", or "TERMINATE")
+            tools: List of tool names to register with the agent
+        """
+        self.name = name
+        self.system_message = system_message
+        self.llm_config = llm_config or default_llm_config
+        self.update_function = update_function
+        self.human_input_mode = human_input_mode
+        self.agent = None
+        self.registered_tools = set()
+        self.tool_functions = {}
+        self.tool_descriptions = {}
+        self.tool_parameters = {}
 
-        if config_list:
-            llm_config['config_list'] = config_list
-        elif 'config_list' not in llm_config and default_config_list:
-            llm_config['config_list'] = default_config_list
+        # Register tools if provided
+        if tools:
+            for tool_name in tools:
+                self.register_tool(tool_name)
 
-        super().__init__(
-            name=name,
-            system_message=system_message,
-            llm_config=llm_config,
-            **kwargs
+        # Initialize the agent
+        self._initialize_agent()
+
+    def _initialize_agent(self):
+        """Initialize the ConversableAgent with the provided configuration."""
+        # Create a state update function if an update function is provided
+        state_update = None
+        if self.update_function:
+            state_update = UpdateSystemMessage(self._update_system_message)
+
+        # Prepare functions for the agent
+        functions = []
+        if self.update_function:
+            functions.append(self.update_function)
+
+        # Add tool functions to the functions list
+        for func in self.tool_functions.values():
+            functions.append(func)
+
+        # Format tool functions for the LLM config
+        if self.tool_functions and "tools" not in self.llm_config:
+            self.llm_config["tools"] = []
+
+        # Add tool definitions to LLM config
+        for tool_name, func in self.tool_functions.items():
+            # Create function definition
+            formatted_func = {
+                "name": tool_name,
+                "description": self.tool_descriptions.get(tool_name, ""),
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            }
+
+            # Add parameters
+            params = self.tool_parameters.get(tool_name, {})
+            for param_name, param_info in params.items():
+                formatted_func["parameters"]["properties"][param_name] = {
+                    "type": param_info.get("type", "string"),
+                    "description": param_info.get("description", "")
+                }
+                if param_info.get("required", False):
+                    formatted_func["parameters"]["required"].append(param_name)
+
+            # Add to tools list
+            self.llm_config["tools"].append({"type": "function", "function": formatted_func})
+
+        # Create the agent
+        self.agent = ConversableAgent(
+            name=self.name,
+            system_message=self.system_message,
+            llm_config=self.llm_config,
+            functions=functions if functions else None,
+            update_agent_state_before_reply=[state_update] if state_update else None,
+            human_input_mode=self.human_input_mode
         )
-        
-        # Register the agent
-        BaseAgent._registry[name] = self
-        
-        logger.info(f"Initialized agent: {name} with token limit: {get_agent_limit(self.name)} "
-                    f"(cache: {use_cache})")
 
-    async def async_init(self):
+    def _update_system_message(self, _agent: ConversableAgent, _messages) -> str:
         """
-        Async initialization method.
-        
-        Override this in derived classes for async initialization.
-        Returns self for method chaining.
+        Update the system message based on the current context.
+        This method can be overridden by subclasses to provide custom behavior.
+
+        Args:
+            _agent: The agent instance (unused in base implementation)
+            _messages: The current message history (unused in base implementation)
+
+        Returns:
+            The updated system message
         """
-        self.company_profile = load_company_profile()
-        return self
+        # Default implementation just returns the original system message
+        # Subclasses can override this to provide dynamic system messages
+        return self.system_message
 
-    async def execute_task(self, task: Any, context=None) -> str:
-        """Execute a task with caching and token tracking support"""
-        if context is None:
-            context = {}
-        
-        # --- Safely create log preview for task --- 
-        log_task_preview = ""
-        if isinstance(task, (str, bytes)):
-            log_task_preview = str(task)[:100] + ("..." if len(str(task)) > 100 else "")
-        elif isinstance(task, dict):
-            try:
-                import json
-                log_task_preview = json.dumps(task)[:100] + "..."
-            except TypeError:
-                 log_task_preview = f"<dict with keys: {list(task.keys())[:5]}... >"
-        else:
-            log_task_preview = f"<{type(task).__name__}>"
-        # --- End safe log preview --- 
-        
-        logger.info("-" * 60)
-        # Use the safe preview without the format specifier
-        logger.info(f"[{self.name}] Running task: {log_task_preview}")
-
-        # Check cache (Need to handle non-string keys if task is not string)
-        cache_key = task if isinstance(task, str) else repr(task) # Use repr for non-string cache keys
-        if self.use_cache and self._cache.has(cache_key, self.name):
-            result = self._cache.get(cache_key, self.name)
-            logger.debug(f"[{self.name}] Cache hit for task key: {log_task_preview}")
-            return result
-
-        # Cache miss → handle the task
-        logger.debug(f"[{self.name}] Cache miss, executing task: {log_task_preview}")
-        result = await self.handle_task(task, context) # Pass original task
-
-        # Track token usage estimate
-        # Convert task to string representation for estimation
-        task_str = str(task) if task is not None else ""
-        result_str = str(result) if result is not None else ""
-        
-        try:
-            prompt_tokens = token_tracker.estimate_tokens(task_str)
-            result_tokens = token_tracker.estimate_tokens(result_str)
-            token_tracker.log_tokens(self.name, prompt_tokens, result_tokens)
-        except Exception as e:
-            logger.error(f"[{self.name}] Error tracking tokens: {e}")
-
-        # Save to cache using the same key logic
-        if self.use_cache:
-            self._cache.save(cache_key, self.name, result)
-            logger.debug(f"[{self.name}] Cached result for task key: {log_task_preview}")
-            
-        return result
-
-    @abstractmethod
-    async def handle_task(self, task: Any, context: Dict[str, Any]) -> str:
+    def register_tool(self, tool_name: str) -> bool:
         """
-        Process a specific task and return the result.
-        Must be implemented by subclasses.
-        """
-        pass
+        Register a tool with the agent.
 
-    def generate_default_system_prompt(self):
-        profile = self.company_profile
-        industry = profile.get("industry", "unknown sector")
-        region = profile.get("region", "global")
-        return (f"You are an AI agent specialized in threats for the {industry} industry, "
-                f"operating in the {region} region. Act accordingly.")
-    
-    # Inter-agent communication methods
-    async def send_message_to_agent(self, target_agent_name: str, message: Any, context: Dict[str, Any] = None) -> str:
-        """Send a message to another agent and wait for a response"""
-        if context is None:
-            context = {}
-            
-        target_agent = self.get_agent(target_agent_name)
-        if not target_agent:
-            logger.error(f"[{self.name}] Failed to send message: Agent '{target_agent_name}' not found")
-            return f"Error: Agent '{target_agent_name}' not found"
-            
-        # --- Safely create log preview --- 
-        log_message_preview = ""
-        if isinstance(message, (str, bytes)):
-            log_message_preview = str(message)[:100] + "..."
-        elif isinstance(message, dict):
-            # Try to show keys or a short JSON representation for dicts
-            try:
-                import json
-                log_message_preview = json.dumps(message)[:100] + "..."
-            except TypeError:
-                 log_message_preview = f"<dict with keys: {list(message.keys())[:5]}... >"
-        else:
-            # Fallback for other types
-            log_message_preview = f"<{type(message).__name__}>"
-        # --- End safe log preview --- 
-        
-        logger.info(f"[{self.name}] Sending message to [{target_agent_name}]: {log_message_preview}")
-        
-        # Add sender information to context
-        context['sender'] = self.name
-        context['message_type'] = 'inter_agent_communication'
-        
-        # Send task to target agent
-        # The 'message' here is passed to the target agent's handle_task
-        response = await target_agent.execute_task(message, context)
-        
-        # Safely log response preview
-        log_response_preview = str(response)[:100] + "..." if isinstance(response, (str, bytes)) else f"<{type(response).__name__}>"
-        logger.info(f"[{self.name}] Received response from [{target_agent_name}]: {log_response_preview}")
-        
-        return response
-    
-    async def broadcast_message(self, message: str, exclude: List[str] = None, context: Dict[str, Any] = None) -> Dict[str, str]:
-        """Send a message to all registered agents except those in the exclude list"""
-        if exclude is None:
-            exclude = [self.name]  # Don't send to self by default
-        else:
-            exclude.append(self.name)  # Always add self to exclude list
-            
-        if context is None:
-            context = {}
-            
-        context['sender'] = self.name
-        context['message_type'] = 'broadcast'
-        
-        responses = {}
-        tasks = []
-        
-        # Create tasks for sending messages to all agents except excluded ones
-        for agent_name, agent in BaseAgent._registry.items():
-            if agent_name not in exclude:
-                tasks.append(agent.execute_task(message, context))
-                
-        # Wait for all responses
-        if tasks:
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            for i, agent_name in enumerate([name for name in BaseAgent._registry if name not in exclude]):
-                if isinstance(results[i], Exception):
-                    responses[agent_name] = f"Error: {str(results[i])}"
-                else:
-                    responses[agent_name] = results[i]
-                    
-        return responses
-    
-    def register_collaborator(self, agent_name: str, role: str = "collaborator"):
-        """Register an agent as a collaborator with a specific role"""
-        if agent_name in BaseAgent._registry:
-            self._collaborators[agent_name] = role
-            logger.info(f"[{self.name}] Registered {agent_name} as {role}")
-        else:
-            logger.warning(f"[{self.name}] Failed to register collaborator: Agent '{agent_name}' not found")
-    
-    def get_collaborators(self) -> Dict[str, str]:
-        """Get dictionary of registered collaborators and their roles"""
-        return self._collaborators.copy()
-    
-    @classmethod
-    def get_agent(cls, agent_name: str) -> Optional['BaseAgent']:
-        """Get an agent by name from the registry"""
-        return cls._registry.get(agent_name)
-    
-    @classmethod
-    def get_all_agents(cls) -> Dict[str, 'BaseAgent']:
-        """Get all registered agents"""
-        return cls._registry.copy()
-    
-    async def collaborate(self, task: str, collaborator_names: List[str] = None, context: Dict[str, Any] = None) -> Dict[str, str]:
-        """Collaborate with specific agents on a task"""
-        if collaborator_names is None:
-            collaborator_names = list(self._collaborators.keys())
-            
-        if context is None:
-            context = {}
-            
-        context['collaboration_task'] = True
-        context['initiator'] = self.name
-        
-        responses = {}
-        for agent_name in collaborator_names:
-            response = await self.send_message_to_agent(agent_name, task, context)
-            responses[agent_name] = response
-            
-        return responses
-    
-    async def integrate_pycti(self, method_name: str, *args, **kwargs):
+        Args:
+            tool_name: Name of the tool to register
+
+        Returns:
+            True if the tool was registered successfully, False otherwise
         """
-        Integration point for pyCTI operations
-        Override in derived classes that need to work with OpenCTI via pyCTI
+        if tool_name in self.registered_tools:
+            return True  # Already registered
+
+        tool_function = get_tool_function(tool_name)
+        if not tool_function:
+            return False  # Tool not found
+
+        # Get tool description and parameters
+        tool_description = get_tool_description(tool_name)
+        tool_parameters = get_tool_parameters(tool_name)
+
+        # Add to registered tools set
+        self.registered_tools.add(tool_name)
+
+        # Store the function and metadata
+        self.tool_functions[tool_name] = tool_function
+        self.tool_descriptions[tool_name] = tool_description
+        self.tool_parameters[tool_name] = tool_parameters
+
+        # Reinitialize the agent if already initialized
+        if self.agent:
+            self._initialize_agent()
+
+        return True
+
+    def unregister_tool(self, tool_name: str) -> bool:
         """
-        logger.warning(f"[{self.name}] pyCTI integration not implemented for method: {method_name}")
-        return None
+        Unregister a tool from the agent.
+
+        Args:
+            tool_name: Name of the tool to unregister
+
+        Returns:
+            True if the tool was unregistered successfully, False otherwise
+        """
+        if tool_name not in self.registered_tools:
+            return False  # Not registered
+
+        # Remove from registered tools set
+        self.registered_tools.remove(tool_name)
+
+        # Remove the function and metadata
+        if tool_name in self.tool_functions:
+            del self.tool_functions[tool_name]
+        if tool_name in self.tool_descriptions:
+            del self.tool_descriptions[tool_name]
+        if tool_name in self.tool_parameters:
+            del self.tool_parameters[tool_name]
+
+        # Reinitialize the agent
+        if self.agent:
+            self._initialize_agent()
+
+        return True
+
+    def get_registered_tools(self) -> Set[str]:
+        """
+        Get the names of all tools registered with the agent.
+
+        Returns:
+            Set of tool names
+        """
+        return self.registered_tools
+
+    def has_tool(self, tool_name: str) -> bool:
+        """
+        Check if the agent has a specific tool registered.
+
+        Args:
+            tool_name: Name of the tool to check
+
+        Returns:
+            True if the tool is registered, False otherwise
+        """
+        return tool_name in self.registered_tools
+
+    @property
+    def conversable_agent(self) -> ConversableAgent:
+        """Get the underlying ConversableAgent instance."""
+        return self.agent

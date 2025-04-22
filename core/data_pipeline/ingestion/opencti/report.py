@@ -155,3 +155,53 @@ class ReportIngestor(BaseIngestor):
             structured["raw_data"] = report
             
         return structured 
+    
+    def create_report(self, report_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Create a new report in OpenCTI."""
+        try:
+            # Ensure published is in correct format
+            if report_data.get('published') is None:
+                # Use current UTC time if no published date is provided
+                report_data['published'] = datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            elif isinstance(report_data.get('published'), datetime):
+                report_data['published'] = report_data['published'].strftime("%Y-%m-%dT%H:%M:%SZ")
+            
+            # Prepare parameters matching OpenCTI's expected format
+            create_params = {
+                "name": report_data.get('name'),
+                "published": report_data.get('published'),
+                "description": report_data.get('description'),
+                "report_types": report_data.get('report_types'),
+                "createdBy": report_data.get('created_by'),
+                "objectMarking": report_data.get('object_marking'),
+                "objectLabel": report_data.get('object_label'),
+                "objectAssignee": report_data.get('object_assignee'),
+                "objectParticipant": report_data.get('object_participant'),
+                "objectOrganization": report_data.get('object_organization'),
+                "externalReferences": report_data.get('external_references'),
+                "confidence": report_data.get('confidence'),
+                "lang": report_data.get('lang'),
+                "created": report_data.get('created'),
+                "modified": report_data.get('modified'),
+                "content": report_data.get('content'),
+                "objects": report_data.get('objects'),
+                "stix_id": report_data.get('stix_id'),
+                "x_opencti_reliability": report_data.get('x_opencti_reliability'),
+                "x_opencti_stix_ids": report_data.get('x_opencti_stix_ids'),
+                "x_opencti_workflow_id": report_data.get('x_opencti_workflow_id'),
+                "revoked": report_data.get('revoked', False),
+                "update": report_data.get('update', False)
+            }
+            
+            # Remove None values
+            create_params = {k: v for k, v in create_params.items() if v is not None}
+            
+            result = self.opencti.report.create(**create_params)
+            if result:
+                logger.info(f"Successfully created report with ID: {result.get('id')}")
+                self.invalidate_cache()
+            return result
+        
+        except Exception as e:
+            logger.error(f"Error creating report: {str(e)}")
+            return None
