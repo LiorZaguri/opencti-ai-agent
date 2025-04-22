@@ -5,7 +5,6 @@ test_memory/
 __pycache__/
 *.pyc
 .env
-.env.*
 .venv/
 dist/
 build/
@@ -13,6 +12,12 @@ build/
 
 # Logs
 *.log
+
+# Cache files
+data/cache/
+.cache/
+**/cache/
+*.cache
 
 # VSCode or IDE
 .vscode/
