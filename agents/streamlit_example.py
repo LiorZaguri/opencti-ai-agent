@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from agents.base import BaseAgent
-from autogen import initiate_swarm_chat
+# Removed unused imports like initiate_swarm_chat, ContextVariables
 import agents.tools.opencti_tools as tools_pkg
 
 # Sidebar: Tool selection
@@ -36,10 +36,14 @@ if st.sidebar.button("Save Tools"):
         "Tools updated: " + ", ".join(st.session_state.selected_tools)
         if st.session_state.selected_tools else "No tools selected"
     )
+    # Force agent re-initialization when tools change by removing it from state
+    if 'cti_agent' in st.session_state:
+        del st.session_state.cti_agent
+    # Clear chat history when tools change
+    st.session_state.chat_history = []
 
-# Instantiate or update CTI agent
-if 'cti_agent' not in st.session_state or st.session_state.get('selected_tools') is not None:
-    # Create a dynamic system message that lists enabled tools
+# Instantiate or update CTI agent if not in session state
+if 'cti_agent' not in st.session_state:
     enabled = st.session_state.selected_tools
     if enabled:
         tools_context = "Available tools: " + ", ".join(enabled)
@@ -49,53 +53,53 @@ if 'cti_agent' not in st.session_state or st.session_state.get('selected_tools')
         f"You are an OpenCTI Cyber Threat Intelligence Agent. {tools_context}. "
         "Leverage OpenCTI and these tools to provide accurate, context-rich intelligence to the user."
     )
+    # Initialize BaseAgent - it will use default_llm_config from model_configs
     st.session_state.cti_agent = BaseAgent(
         name="CTI_Agent",
         system_message=system_message,
         tools=enabled
     )
+    st.rerun() # Rerun to update UI after agent initialization
 
-# Interactive chat without persistent history
+# Interactive chat
 st.title("💬 CTI Agent Chat")
 
 # Display currently enabled tools below the title as bubbles
-if st.session_state.selected_tools:
-    # Render bubbles inline using HTML spans
+enabled_tools = st.session_state.cti_agent.get_registered_tools()
+if enabled_tools:
     bubble_html = "".join(
-    f"<span style='display:inline-block; padding:6px 12px; margin:2px; border:1px solid #888; border-radius:12px; font-size:0.9em;'>{tool}</span>"
-    for tool in st.session_state.selected_tools
-)
+        f"<span style='display:inline-block; padding:6px 12px; margin:2px; border:1px solid #888; border-radius:12px; font-size:0.9em;'>{tool}</span>"
+        for tool in enabled_tools
+    )
     st.markdown(
         f"**Enabled tools:** {bubble_html}", unsafe_allow_html=True
     )
 else:
-    st.info("No tools enabled. Please configure tools in the sidebar.")
+    st.info("No tools enabled. Configure tools in the sidebar and click 'Save Tools'.")
+
+# Initialize chat history in session state if it doesn't exist
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
+
+# Display chat history
+for message in st.session_state.chat_history:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
 
 # User input
 user_input = st.chat_input("Enter your message")
 if user_input:
-    # Display user message immediately
-    st.chat_message("user").write(user_input)
+    # Add user message to chat history and display it
+    st.session_state.chat_history.append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.write(user_input)
 
-    # Show spinner under the user message
+    # Show spinner while agent is processing
     with st.spinner("CTI Agent is thinking..."):
-        cti_conv = st.session_state.cti_agent.conversable_agent
-        result, tool_execs, _ = initiate_swarm_chat(
-            initial_agent=cti_conv,
-            agents=[cti_conv],
-            user_agent=None,
-            messages=user_input,
-            max_rounds=50,
-        )
-        assistant_reply = result.chat_history[-1]["content"]
+        # Call the run method from BaseAgent
+        assistant_reply = st.session_state.cti_agent.run(user_input)
 
-    # Display assistant reply
-    st.chat_message("assistant").write(assistant_reply)
-
-    # Execute and display tool outputs
-    if tool_execs:
-        for tool in st.session_state.selected_tools:
-            func = getattr(tools_pkg, tool, None)
-            if func:
-                output = func()
-                st.chat_message("system").write(f"Tool {tool} output: {output}")
+    # Add assistant reply to chat history and display it
+    st.session_state.chat_history.append({"role": "assistant", "content": assistant_reply})
+    with st.chat_message("assistant"):
+        st.write(assistant_reply)
