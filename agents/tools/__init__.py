@@ -224,12 +224,12 @@ AVAILABLE_TOOLS = {
     "entity_counts": {
         "function": entity_counts,
         "category": "opencti",
-        "description": "Get counts of different entity types in OpenCTI. This helps understand what data is available in the platform.",
+        "description": "Get counts of different entity types in OpenCTI. Can be filtered by time range.",
         "parameters": {
-            "limit": {
+            "days_back": {
                 "type": "integer",
-                "description": "Sample size for counting entities",
-                "default": 10
+                "description": "Optional number of days to look back. If not provided, returns all-time counts.",
+                "default": None
             }
         }
     },

@@ -251,15 +251,23 @@ def create_indicator(
         logger.error(f"Error creating indicator: {e}")
         return None
 
-def entity_counts(limit: int = 10) -> Dict[str, int]:
-    """Get counts of different entity types in OpenCTI."""
-    logger.info(f"Tool: Testing entity counts with limit: {limit}")
+def entity_counts(days_back: Optional[int] = None) -> Dict[str, int]:
+    """
+    Get counts of different entity types in OpenCTI.
+    
+    Args:
+        days_back: Optional number of days to look back. If None, returns all-time counts.
+        
+    Returns:
+        Dictionary containing counts for each entity type.
+    """
+    logger.info(f"Tool: Getting entity counts{f' for past {days_back} days' if days_back else ''}")
     try:
-        result = _ingestors['indicator'].opencti.test_entity_counts(limit=limit)
+        result = _ingestors['indicator'].opencti.entity_counts(days_back=days_back)
         logger.info(f"Entity counts: {result}")
         return result
     except Exception as e:
-        logger.error(f"Error testing entity counts: {str(e)}")
+        logger.error(f"Error getting entity counts: {str(e)}")
         return {}
 
 def clear_opencti_caches() -> None:

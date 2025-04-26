@@ -24,4 +24,4 @@ class BaseIngestor:
     def invalidate_cache(self) -> None:
         """Clear specific ingestor's cache entries"""
         prefix = self.__class__.__name__
-        invalidate_cache_prefix(prefix) 
+        invalidate_cache_prefix(prefix)

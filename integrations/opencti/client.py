@@ -15,6 +15,7 @@ from integrations.opencti.entities import (
     ReportMethods,
     RelationshipMethods
 )
+from datetime import datetime, timedelta, timezone
 
 logger = setup_logger(name="OpenCTIConnector", component_type="utils")
 
@@ -132,24 +133,75 @@ class OpenCTIConnector:
         """
         return self._indicator.create(indicator_data)
 
-    def test_entity_counts(self, limit=10):
+    def entity_counts(self, days_back: int = None):
         """
-        Debug method to count different entity types available through the API.
+        Get counts of different entity types in OpenCTI via a single GraphQL call.
+
+        Args:
+            days_back: Optional number of days to look back. If None, returns all-time counts.
+
+        Returns:
+            Dictionary containing counts for each entity type.
         """
         try:
-            results = {
-                "all_entities": len(self.client.stix_domain_object.list(first=100)),
-                "threat_actors": len(self.client.threat_actor.list(first=limit)),
-                "indicators": len(self.client.indicator.list(first=limit)),
-                "observables": len(self.client.stix_cyber_observable.list(first=limit)),
-                "vulnerabilities": len(self.client.vulnerability.list(first=limit)) if hasattr(self.client, 'vulnerability') else "N/A",
-                "reports": len(self.client.report.list(first=limit)),
-                "malware": len(self.client.malware.list(first=limit)),
-                "attack_patterns": len(self.client.attack_pattern.list(first=limit)),
-                "intrusion_sets": len(self.client.intrusion_set.list(first=limit)) if hasattr(self.client, 'intrusion_set') else "N/A"
+            # Build the filters block for “last N days”
+            if days_back is not None:
+                now = datetime.now(timezone.utc)
+                start = now - timedelta(days=days_back)
+                start_str = start.strftime("%Y-%m-%dT%H:%M:%SZ")
+                end_str = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+                filter_arg = f'''
+                    filters: {{
+                    mode: and,
+                    filters: [
+                        {{ key: "created_at", values: ["{start_str}"], operator: gt }},
+                        {{ key: "created_at", values: ["{end_str}"], operator: lt }}
+                    ],
+                    filterGroups: []
+                    }}
+                '''
+            else:
+                # no filters = all-time
+                filter_arg = ""
+
+            # Assemble the GraphQL query
+            gql = f"""
+            query EntityCounts {{
+            indicators(first: 0 {',' if filter_arg else ''} {filter_arg}) {{
+                pageInfo {{ globalCount }}
+            }}
+            reports(first: 0 {',' if filter_arg else ''} {filter_arg}) {{
+                pageInfo {{ globalCount }}
+            }}
+            threatActors(first: 0 {',' if filter_arg else ''} {filter_arg}) {{
+                pageInfo {{ globalCount }}
+            }}
+            stixCyberObservables(first: 0 {',' if filter_arg else ''} {filter_arg}) {{
+                pageInfo {{ globalCount }}
+            }}
+            vulnerabilities(first: 0 {',' if filter_arg else ''} {filter_arg}) {{
+                pageInfo {{ globalCount }}
+            }}
+            malwares(first: 0 {',' if filter_arg else ''} {filter_arg}) {{
+                pageInfo {{ globalCount }}
+            }}
+            }}
+            """
+
+            # Execute a single GraphQL request instead of multiple REST calls
+            resp = self.client.query(gql)  # submit a query to the OpenCTI GraphQL API :contentReference[oaicite:0]{index=0}
+            data = resp.get("data", {})
+
+            # Extract the six counts
+            return {
+                "indicators":              data["indicators"]["pageInfo"]["globalCount"],
+                "reports":                 data["reports"]["pageInfo"]["globalCount"],
+                "threat_actors":           data["threatActors"]["pageInfo"]["globalCount"],
+                "observables":             data["stixCyberObservables"]["pageInfo"]["globalCount"],
+                "vulnerabilities":         data["vulnerabilities"]["pageInfo"]["globalCount"],
+                "malware":                 data["malwares"]["pageInfo"]["globalCount"],
             }
-            logger.debug(f"Entity counts: {results}")
-            return results
+
         except Exception as e:
-            logger.error(f"Error testing entity counts: {str(e)}")
-            return {} 
+            logger.error(f"Error getting entity counts via GraphQL: {e}")
+            return {}
