@@ -1,0 +1,35 @@
+{
+  "company_name": "Clear Manufacturing Inc",
+  "industry": "manufacturing",
+  "region": "Europe",
+  "organization_size": "large",
+  "business_model": "B2B",
+  "tech_stack": [
+    "SAP ERP",
+    "Siemens PLC",
+    "Linux Servers",
+    "Cisco Switches"
+  ],
+  "compliance": ["ISO 9001", "ISO 27001"],
+  "has_internal_soc": false,
+  "security_maturity": "basic",
+  "threat_priority": [
+    "supply chain disruption",
+    "industrial espionage",
+    "DDoS",
+    "physical intrusion"
+  ],
+  "critical_assets": [
+    "production line controllers",
+    "supply chain data",
+    "proprietary designs"
+  ],
+  "risk_tolerance": "medium",
+  "past_incidents": ["DDoS-2021"],
+  "preferred_language": "German",
+  "operating_hours": {
+    "timezone": "CET",
+    "business_days": ["Monday", "Friday"],
+    "open_hours": ["07:00", "15:00"]
+  }
+} 

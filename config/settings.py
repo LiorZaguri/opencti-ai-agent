@@ -7,7 +7,7 @@ load_dotenv()
 # === LLM ===
 LLM_API_KEY = os.getenv("LLM_API_KEY")
 LLM_API_URL = os.getenv("LLM_API_URL", "https://api.openai.com")
-LLM_BASE_MODEL = os.getenv("LLM_BASE_MODEL")
+LLM_BASE_MODEL = "deepseek/deepseek-chat-v3-0324:free"
 
 if not LLM_BASE_MODEL or not LLM_API_KEY:
     raise ValueError("LLM configuration is required")

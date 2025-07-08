@@ -15,7 +15,16 @@
   "compliance": ["HIPAA", "HITRUST"],
   "has_internal_soc": true,
   "security_maturity": "advanced",
-  "threat_priority": ["ransomware", "phishing", "data exfiltration"],
+  "threat_priority": [
+    "ransomware",
+    "phishing",
+    "data exfiltration",
+    "Akira ransomware",
+    "BRUTED",
+    "ShadowLink",
+    "info-stealer",
+    "remote access trojan"
+  ],
   "critical_assets": [
     "electronic health records",
     "medical imaging systems",
