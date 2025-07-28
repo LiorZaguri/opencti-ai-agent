@@ -1,35 +1,53 @@
 {
-  "company_name": "Clear Manufacturing Inc",
-  "industry": "manufacturing",
-  "region": "Europe",
-  "organization_size": "large",
-  "business_model": "B2B",
+  "company_name": "SecureHealth Corp",
+  "industry": "healthcare",
+  "region": "North America",
+  "organization_size": "mid",
+  "business_model": "B2C",
   "tech_stack": [
-    "SAP ERP",
-    "Siemens PLC",
-    "Linux Servers",
-    "Cisco Switches"
+    "Windows Server111",
+    "Microsoft 365",
+    "Splunk",
+    "Palo Alto Firewall",
+    "Okta",
+    "Azure AD"
   ],
-  "compliance": ["ISO 9001", "ISO 27001"],
-  "has_internal_soc": false,
-  "security_maturity": "basic",
+  "compliance": [
+    "HIPAA",
+    "HITRUST"
+  ],
+  "has_internal_soc": true,
+  "security_maturity": "advanced",
   "threat_priority": [
-    "supply chain disruption",
-    "industrial espionage",
-    "DDoS",
-    "physical intrusion"
+    "ransomware",
+    "phishing",
+    "data exfiltration",
+    "Akira ransomware",
+    "BRUTED",
+    "ShadowLink",
+    "info-stealer",
+    "remote access trojan"
   ],
   "critical_assets": [
-    "production line controllers",
-    "supply chain data",
-    "proprietary designs"
+    "electronic health records",
+    "medical imaging systems",
+    "billing platform"
   ],
-  "risk_tolerance": "medium",
-  "past_incidents": ["DDoS-2021"],
-  "preferred_language": "German",
+  "risk_tolerance": "low",
+  "past_incidents": [
+    "ransomware-2023",
+    "phishing-2022"
+  ],
+  "preferred_language": "English",
   "operating_hours": {
-    "timezone": "CET",
-    "business_days": ["Monday", "Friday"],
-    "open_hours": ["07:00", "15:00"]
+    "timezone": "EST",
+    "business_days": [
+      "Monday",
+      "Friday"
+    ],
+    "open_hours": [
+      "08:00",
+      "18:00"
+    ]
   }
-} 
+}

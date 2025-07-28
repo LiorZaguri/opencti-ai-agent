@@ -4,7 +4,7 @@ import json
 class ThreatEnrichmentAgent(BaseAgent):
     def __init__(self):
         system_message = (
-            "You are ThreatEnrichmentAgent. Your job is to receive the top 10 threats, "
+            "You are ThreatEnrichmentAgent. Your job is to receive the top 10 threats (of any type), "
             "enrich each with public information (e.g., MITRE ATT&CK, security blogs), and provide recommendations for mitigation and response. "
             "Output a structured, human-readable summary for each threat."
         )
@@ -16,7 +16,7 @@ class ThreatEnrichmentAgent(BaseAgent):
 
     def run(self, top_threats: list) -> str:
         """
-        Receives the top 10 threats, enriches each, and returns a structured summary per threat.
+        Receives the top 10 threats (any type), enriches each, and returns a structured summary per threat.
         """
         llm_prompt = (
             f"Top 10 threats: {json.dumps(top_threats)}\n"
