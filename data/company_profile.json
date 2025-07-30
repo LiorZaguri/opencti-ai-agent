@@ -19,7 +19,7 @@
   "has_internal_soc": true,
   "security_maturity": "advanced",
   "threat_priority": [
-    "ransomware",
+    "randsomware",
     "phishing",
     "data exfiltration",
     "Akira ransomware",
@@ -35,8 +35,8 @@
   ],
   "risk_tolerance": "low",
   "past_incidents": [
-    "ransomware-2023",
-    "phishing-2022"
+    "phishing-2022",
+    "ransomware-2023"
   ],
   "preferred_language": "English",
   "operating_hours": {

@@ -5,8 +5,9 @@ import json
 class DataRetrievalAgent(BaseAgent):
     def __init__(self, profile_path="data/company_profile.json"):
         system_message = (
-            "You are DataRetrievalAgent. Your job is to fetch relevant Threat Actors, Malware, Attack Patterns, and Campaigns from OpenCTI, based on the organization profile in company_profile.json. "
-            "Return a dictionary with keys for each entity type."
+            "You are DataRetrievalAgent. Your job is to fetch comprehensive threat intelligence data from OpenCTI "
+            "including Threat Actors, Malware, Attack Patterns, and Campaigns. Retrieve detailed information "
+            "to enable AI-powered analysis rather than basic keyword filtering."
         )
         tools = [
             "get_entities",  # for Malware, Attack Pattern, Campaign
@@ -26,45 +27,35 @@ class DataRetrievalAgent(BaseAgent):
                 return json.load(f)
         return {}
 
-    def _extract_keywords(self):
-        # Extract keywords from relevant profile fields
-        profile = self.profile
-        keywords = set()
-        for field in ["threat_priority", "tech_stack", "critical_assets", "past_incidents", "industry", "region"]:
-            val = profile.get(field)
-            if isinstance(val, list):
-                keywords.update([v.lower() for v in val])
-            elif isinstance(val, str):
-                keywords.add(val.lower())
-        return keywords
-
-    def _filter_entities(self, entities):
-        # Filter entities by keyword match in name/description/labels
-        keywords = self._extract_keywords()
-        filtered = []
-        for ent in entities:
-            text = " ".join([
-                str(ent.get("name", "")),
-                str(ent.get("description", "")),
-                " ".join(ent.get("labels", []))
-            ]).lower()
-            if any(kw in text for kw in keywords):
-                filtered.append(ent)
-        return filtered
-
     def run(self, prompt: str = None) -> str:
-        # Query all relevant entity types
+        """
+        Retrieve comprehensive threat data for AI analysis.
+        Fetch data like a real threat intelligence analyst would - multiple entity types with higher limits.
+        """
+        # Query comprehensive threat data with higher limits for better AI analysis
         result = {}
-        # Threat Actors
-        threat_actors = self.tool_functions["get_threat_actors"](limit=100)
-        result["threat_actors"] = self._filter_entities(threat_actors)
-        # Malware
-        malware = self.tool_functions["get_entities"](entity_type="Malware", limit=100)
-        result["malware"] = self._filter_entities(malware)
-        # Attack Patterns
-        attack_patterns = self.tool_functions["get_entities"](entity_type="Attack-Pattern", limit=100)
-        result["attack_patterns"] = self._filter_entities(attack_patterns)
-        # Campaigns
-        campaigns = self.tool_functions["get_entities"](entity_type="Campaign", limit=100)
-        result["campaigns"] = self._filter_entities(campaigns)
+        
+        # Define entity types to fetch with their limits
+        entity_configs = [
+            ("malware", "get_entities", 100, "Malware"),
+            ("attack_patterns", "get_entities", 20, "Attack-Pattern"),
+            ("campaigns", "get_entities", 20, "Campaign"),
+            ("intrusion_sets", "get_entities", 20, "Intrusion-Set"),
+            ("vulnerabilities", "get_entities", 20, "Vulnerability"),
+            ("threat_reports", "get_entities", 20, "Report")
+        ]
+        
+        for entity_name, tool_name, limit, *args in entity_configs:
+            try:
+                if tool_name == "get_threat_actors":
+                    entities = self.tool_functions[tool_name](limit=limit)
+                else:
+                    entity_type = args[0]
+                    entities = self.tool_functions[tool_name](entity_type=entity_type, limit=limit)
+                result[entity_name] = entities
+            except Exception as e:
+                # If a specific entity type fails, log it but continue with others
+                print(f"Warning: Failed to fetch {entity_name}: {str(e)}")
+                result[entity_name] = []
+        
         return json.dumps(result) 

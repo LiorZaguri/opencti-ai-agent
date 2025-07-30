@@ -1,0 +1,54 @@
+{
+  "company_name": "Gal Scoba Diving LTD",
+  "industry": "Antique Typewriter Restoration",
+  "region": "Rural Scotland",
+  "business_model": "B2C",
+  "security_maturity": "basic",
+  "risk_tolerance": "low",
+  "has_internal_soc": false,
+  "tech_stack": [
+    "Legacy COBOL System",
+    "FrostOS 1.0",
+    "Custom Internal Tool",
+    "Proprietary Software",
+    "Ancient Mainframe",
+    "Hand-cranked Database",
+    "Steam-powered Server",
+    "Quill-based Interface"
+  ],
+  "critical_assets": [
+    "Hand-crafted wooden typewriter parts",
+    "Antique restoration tools",
+    "Local customer database",
+    "Handwritten inventory system",
+    "Feather duster collection",
+    "Vintage ink bottles",
+    "Manual paper cutter",
+    "Hand-operated bell system"
+  ],
+  "compliance": [
+    "Local woodworking safety standards",
+    "Antique preservation guidelines",
+    "Small business tax compliance",
+    "Feather duster maintenance protocol",
+    "Ink bottle storage regulations",
+    "Bell system safety standards"
+  ],
+  "threat_priority": [
+    "Splinter prevention",
+    "Ink spill containment",
+    "Bell maintenance",
+    "Feather duster security",
+    "Paper cut prevention"
+  ],
+  "past_incidents": [
+    "Splinter injury in workshop",
+    "Paint spill on antique table",
+    "Local power outage affecting tools",
+    "Feather duster malfunction",
+    "Bell system rust",
+    "Ink bottle evaporation",
+    "Paper cut during inventory",
+    "Typewriter key stuck"
+  ]
+} 

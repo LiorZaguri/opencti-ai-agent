@@ -1,0 +1,24 @@
+{
+  "company_name": "Minimal Test Corp",
+  "industry": "Local Services",
+  "region": "Small Town",
+  "business_model": "B2C",
+  "security_maturity": "basic",
+  "risk_tolerance": "low",
+  "has_internal_soc": false,
+  "tech_stack": [
+    "Basic Computer"
+  ],
+  "critical_assets": [
+    "Basic Records"
+  ],
+  "compliance": [
+    "Local Business License"
+  ],
+  "threat_priority": [
+    "Basic Security"
+  ],
+  "past_incidents": [
+    "None"
+  ]
+} 

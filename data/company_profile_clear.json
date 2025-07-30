@@ -1,53 +1,37 @@
 {
-  "company_name": "SecureHealth Corp",
-  "industry": "healthcare",
-  "region": "North America",
-  "organization_size": "mid",
-  "business_model": "B2C",
+  "company_name": "Obscura Widgets Ltd",
+  "industry": "antique typewriter restoration",
+  "region": "Antarctica",
+  "organization_size": "micro",
+  "business_model": "B2B",
   "tech_stack": [
-    "Windows Server111",
-    "Microsoft 365",
-    "Splunk",
-    "Palo Alto Firewall",
-    "Okta",
-    "Azure AD"
+    "FrostOS 1.0",
+    "IceDB",
+    "PenguinMail",
+    "ArcticERP"
   ],
   "compliance": [
-    "HIPAA",
-    "HITRUST"
+    "ISO-0000",
+    "ANTARCTIC-PRIVACY"
   ],
-  "has_internal_soc": true,
-  "security_maturity": "advanced",
+  "has_internal_soc": false,
+  "security_maturity": "basic",
   "threat_priority": [
-    "ransomware",
-    "phishing",
-    "data exfiltration",
-    "Akira ransomware",
-    "BRUTED",
-    "ShadowLink",
-    "info-stealer",
-    "remote access trojan"
+    "typewriter sabotage",
+    "frozen ink theft"
   ],
   "critical_assets": [
-    "electronic health records",
-    "medical imaging systems",
-    "billing platform"
+    "vintage ribbon spools",
+    "manual carriage returns"
   ],
-  "risk_tolerance": "low",
+  "risk_tolerance": "medium",
   "past_incidents": [
-    "ransomware-2023",
-    "phishing-2022"
+    "ink freeze-2019"
   ],
-  "preferred_language": "English",
+  "preferred_language": "Esperanto",
   "operating_hours": {
-    "timezone": "EST",
-    "business_days": [
-      "Monday",
-      "Friday"
-    ],
-    "open_hours": [
-      "08:00",
-      "18:00"
-    ]
+    "timezone": "GMT-12",
+    "business_days": ["Tuesday", "Thursday"],
+    "open_hours": ["11:00", "15:00"]
   }
 }

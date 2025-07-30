@@ -1,0 +1,14 @@
+{
+  "company_name": "Empty Test Corp",
+  "industry": "Test",
+  "region": "Test",
+  "business_model": "Test",
+  "security_maturity": "basic",
+  "risk_tolerance": "low",
+  "has_internal_soc": false,
+  "tech_stack": [],
+  "critical_assets": [],
+  "compliance": [],
+  "threat_priority": [],
+  "past_incidents": []
+} 

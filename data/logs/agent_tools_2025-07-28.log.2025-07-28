@@ -1,0 +1,112 @@
+[2025-07-28 16:36:18,475] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 16:36:18,814] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 16:36:18,814] [INFO] [opencti_tools] Tool: Retrieving indicators from OpenCTI with filters: None, limit: 100
+[2025-07-28 16:36:18,826] [INFO] [opencti_tools] Retrieved 0 indicators
+[2025-07-28 16:37:39,383] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 16:37:39,631] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 16:37:39,631] [INFO] [opencti_tools] Tool: Retrieving indicators from OpenCTI with filters: None, limit: 100
+[2025-07-28 16:37:39,661] [INFO] [opencti_tools] Retrieved 0 indicators
+[2025-07-28 16:50:57,032] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 16:50:57,091] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 16:50:57,091] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 16:50:57,361] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 16:50:57,361] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 16:50:57,790] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 16:50:57,790] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 16:50:57,807] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 16:51:40,309] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 16:51:40,336] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 16:51:40,336] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 16:51:40,582] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 16:51:40,583] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 16:51:41,060] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 16:51:41,060] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 16:51:41,073] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 16:55:07,426] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 16:55:07,493] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 16:55:07,493] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 16:55:07,777] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 16:55:07,777] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 16:55:08,269] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 16:55:08,269] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 16:55:08,284] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 16:58:49,044] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 16:58:49,083] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 16:58:49,083] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 16:58:49,301] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 16:58:49,301] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 16:58:49,750] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 16:58:49,750] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 16:58:49,769] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:01:39,902] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:01:39,957] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:01:39,957] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:01:40,157] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:01:40,157] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:01:40,617] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:01:40,617] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:01:40,635] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:06:35,258] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:06:35,313] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:06:35,313] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:06:35,552] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:06:35,552] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:06:35,985] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:06:35,985] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:06:35,995] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:12:19,340] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:12:19,430] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:12:19,430] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:12:19,690] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:12:19,690] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:12:20,150] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:12:20,150] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:12:20,162] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:14:57,981] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:14:58,016] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:14:58,016] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:14:58,217] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:14:58,217] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:14:58,613] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:14:58,613] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:14:58,626] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:33:01,630] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:33:01,705] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:33:01,705] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:33:02,085] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:33:02,085] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:33:02,737] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:33:02,737] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:33:02,755] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:35:28,911] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:35:28,933] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:35:28,933] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:35:29,159] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:35:29,159] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:35:29,602] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:35:29,603] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:35:29,620] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:35:59,106] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:35:59,145] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:35:59,145] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:35:59,412] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:35:59,412] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:35:59,917] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:35:59,918] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:35:59,931] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:37:45,937] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:37:45,963] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:37:45,963] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:37:46,149] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:37:46,149] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:37:46,551] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:37:46,551] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:37:46,561] [INFO] [opencti_tools] Retrieved 0 Campaign entities
+[2025-07-28 17:39:05,024] [INFO] [opencti_tools] Tool: Retrieving up to 100 threat actors from OpenCTI
+[2025-07-28 17:39:05,062] [INFO] [opencti_tools] Retrieved 0 threat actors
+[2025-07-28 17:39:05,062] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Malware from OpenCTI
+[2025-07-28 17:39:05,265] [INFO] [opencti_tools] Retrieved 100 Malware entities
+[2025-07-28 17:39:05,265] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Attack-Pattern from OpenCTI
+[2025-07-28 17:39:05,715] [INFO] [opencti_tools] Retrieved 100 Attack-Pattern entities
+[2025-07-28 17:39:05,715] [INFO] [opencti_tools] Tool: Retrieving up to 100 entities of type Campaign from OpenCTI
+[2025-07-28 17:39:05,728] [INFO] [opencti_tools] Retrieved 0 Campaign entities
